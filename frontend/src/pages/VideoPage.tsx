@@ -6,9 +6,11 @@ const { Title, Paragraph, Text } = Typography;
 
 interface VideoPageProps {
   onContinue: () => void;
+  videoType: 'A' | 'B'; // 新增：區分是影片A還是影片B
+  biasResultSuffix?: string; // 新增：傳入偏見結果後綴
 }
 
-function VideoPage({ onContinue }: VideoPageProps) {
+function VideoPage({ onContinue, videoType, biasResultSuffix }: VideoPageProps) {
   // 控制注意事項彈窗顯示
   const [noticeVisible, setNoticeVisible] = useState<boolean>(true);
   // 倒數計時器狀態
@@ -36,6 +38,63 @@ function VideoPage({ onContinue }: VideoPageProps) {
       if (timer) clearTimeout(timer);
     };
   }, [videoStarted, countdown]);
+
+  // 根據影片類型和偏見結果決定影片內容
+  const getVideoUrl = (): string => {
+    // 影片A：根據原本的偏見結果
+    if (videoType === 'A') {
+      if (biasResultSuffix === '_girl') {
+        // 女性與電腦類偏見 - 顯示女性與電腦類產品的影片
+        return 'https://www.youtube.com/embed/dQw4w9WgXcQ'; // 替換為實際的女性電腦類影片
+      } else if (biasResultSuffix === '_boy') {
+        // 男性與護膚類偏見 - 顯示男性與護膚類產品的影片
+        return 'https://www.youtube.com/embed/dQw4w9WgXcQ'; // 替換為實際的男性護膚類影片
+      } else {
+        // 無明顯偏見 - 顯示預設影片（例如女性電腦類）
+        return 'https://www.youtube.com/embed/dQw4w9WgXcQ'; // 替換為實際的預設影片
+      }
+    } 
+    // 影片B：顯示與A相反的內容
+    else {
+      if (biasResultSuffix === '_girl') {
+        // 原本是女性與電腦類偏見，現在顯示男性與護膚類影片
+        return 'https://www.youtube.com/embed/dQw4w9WgXcQ'; // 替換為實際的男性護膚類影片
+      } else if (biasResultSuffix === '_boy') {
+        // 原本是男性與護膚類偏見，現在顯示女性與電腦類影片
+        return 'https://www.youtube.com/embed/dQw4w9WgXcQ'; // 替換為實際的女性電腦類影片
+      } else {
+        // 無明顯偏見 - 顯示另一個影片（例如男性護膚類）
+        return 'https://www.youtube.com/embed/dQw4w9WgXcQ'; // 替換為實際的另一個影片
+      }
+    }
+  };
+
+  // 獲取影片標題
+  const getVideoTitle = (): string => {
+    if (videoType === 'A') {
+      if (biasResultSuffix === '_girl') {
+        return '第一部聊天機器人互動影片（女性與電腦產品）';
+      } else if (biasResultSuffix === '_boy') {
+        return '第一部聊天機器人互動影片（男性與護膚產品）';
+      } else {
+        return '第一部聊天機器人互動影片';
+      }
+    } else {
+      if (biasResultSuffix === '_girl') {
+        return '第二部聊天機器人互動影片（男性與護膚產品）';
+      } else if (biasResultSuffix === '_boy') {
+        return '第二部聊天機器人互動影片（女性與電腦產品）';
+      } else {
+        return '第二部聊天機器人互動影片';
+      }
+    }
+  };
+
+  // 獲取按鈕文字
+  const getButtonText = (): string => {
+    const suffix = videoType === 'A' ? '第一份問卷調查' : '第二份問卷調查';
+    return countdown > 0 ? `前往${suffix} (${countdown})` : `前往${suffix}`;
+  };
 
   return (
     <div className="wide-container">
@@ -156,14 +215,14 @@ function VideoPage({ onContinue }: VideoPageProps) {
         </div>
       </Modal>
 
-      <Title level={2} className="text-center mb-6">觀看影片</Title>
+      <Title level={2} className="text-center mb-6">觀看第{videoType === 'A' ? '一' : '二'}部影片</Title>
       <Paragraph className="text-center mb-6" style={{ fontSize: '1.125rem' }}>
         請觀看以下關於聊天機器人互動的影片，並想像您是影片中的使用者。
       </Paragraph>
       <div className="video-container">
         <iframe
-          src="https://www.youtube.com/embed/dQw4w9WgXcQ" // 替換為實際視頻鏈接
-          title="聊天機器人互動影片"
+          src={getVideoUrl()}
+          title={getVideoTitle()}
           className="video-iframe"
           allowFullScreen
         ></iframe>
@@ -181,7 +240,7 @@ function VideoPage({ onContinue }: VideoPageProps) {
             className="rounded-button large-button"
             disabled={countdown > 0}
           >
-            {countdown > 0 ? `前往問卷調查 (${countdown})` : '前往問卷調查'}
+            {getButtonText()}
           </Button>
         </div>
       </div>

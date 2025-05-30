@@ -4,14 +4,14 @@ import { PlayCircleOutlined, InfoCircleOutlined, BarChartOutlined } from '@ant-d
 import { TestResults } from '../types/testTypes';
 import { createResultsChart } from '../utils/chartUtils';
 import { CustomCard } from '../components/CustomComponents';
-import '../styles/results-page.css'; // CSS 文件
+import '../styles/results-page.css';
 import { saveTestResults } from '../utils/api';
 
 const { Title, Paragraph, Text } = Typography;
 
 interface ResultsPageProps {
   testResults: TestResults;
-  biasType: string; // 改名: biasedProduct -> biasType
+  biasType: string;
   biasLevel: string;
   dScore: number;
   biasedProducts: Array<{ name: string; score: number }>;
@@ -25,7 +25,7 @@ interface ResultsPageProps {
 
 function ResultsPage({
   testResults,
-  biasType, // 改名: biasedProduct -> biasType
+  biasType,
   biasLevel,
   dScore,
   biasedProducts,
@@ -77,10 +77,8 @@ function ResultsPage({
 
   // 建立圖表
   useEffect(() => {
-    // 如果圖表容器不存在，返回一個空的清理函數
     if (!chartRef.current) return () => { };
 
-    // 創建圖表
     const cleanupChart = createResultsChart(chartRef.current, {
       avgMaleComputer,
       avgFemaleSkincare,
@@ -88,11 +86,10 @@ function ResultsPage({
       avgMaleSkincare
     });
 
-    // 確保返回一個函數，即使 cleanupChart 可能不是函數
     return typeof cleanupChart === 'function' ? cleanupChart : () => { };
   }, [avgMaleComputer, avgFemaleSkincare, avgFemaleComputer, avgMaleSkincare]);
 
-  // 在這裡添加新的 useEffect，用於儲存測試結果
+  // 儲存測試結果
   useEffect(() => {
     const saveData = async () => {
       try {
@@ -114,11 +111,9 @@ function ResultsPage({
         } else {
           console.error('❌ 儲存測試結果失敗:', String(error));
         }
-        // 即使儲存失敗也不影響用戶體驗，只記錄錯誤
       }
     };
-  
-    // 只有當有實際測試數據時才儲存
+
     const hasData = testResults.maleComputer.length > 0 || 
                    testResults.femaleSkincare.length > 0 || 
                    testResults.femaleComputer.length > 0 || 
@@ -127,7 +122,7 @@ function ResultsPage({
     if (hasData) {
       saveData();
     }
-  }, [testResults, dScore, biasType, biasLevel, biasDirection, d1, d2, d3, d4]); // 加上完整的依賴陣列
+  }, [testResults, dScore, biasType, biasLevel, biasDirection, d1, d2, d3, d4]);
 
   // 根據 biasType 生成適當的結果解釋
   const getBiasExplanation = () => {
@@ -141,7 +136,7 @@ function ResultsPage({
       );
     }
 
-    if (biasType === 'gender_tech') { // 改名: '電競滑鼠' -> 'gender_tech'
+    if (biasType === 'gender_tech') {
       return (
         <Paragraph style={{ fontSize: '1.125rem' }}>
           根據您的反應時間分析，我們發現您在<Text strong style={{ fontSize: '1.25rem' }}> 女性與電腦類 </Text>
@@ -150,7 +145,7 @@ function ResultsPage({
           的性別刻板印象，傾向於將電腦類產品視為更適合男性的產品。
         </Paragraph>
       );
-    } else { // biasType === 'gender_skincare'
+    } else {
       return (
         <Paragraph style={{ fontSize: '1.125rem' }}>
           根據您的反應時間分析，我們發現您在<Text strong style={{ fontSize: '1.25rem' }}> 男性與護膚類 </Text>
@@ -165,17 +160,16 @@ function ResultsPage({
   // 根據偏見程度獲取顏色
   const getBiasLevelColor = () => {
     switch (biasLevel) {
-      case '高度偏見': return '#f5222d'; // 紅色
-      case '中度偏見': return '#fa8c16'; // 橙色
-      case '輕度偏見': return '#faad14'; // 黃色
-      default: return '#52c41a'; // 綠色 (無偏見)
+      case '高度偏見': return '#f5222d';
+      case '中度偏見': return '#fa8c16';
+      case '輕度偏見': return '#faad14';
+      default: return '#52c41a';
     }
   };
 
   // 獲取偏見程度的百分比
   const getBiasPercentage = () => {
     const absScore = Math.abs(dScore);
-    // 將 D 值轉換為百分比 (0.65+ 視為 100%)
     return Math.min(Math.round(absScore / 0.65 * 100), 100);
   };
 
@@ -545,7 +539,7 @@ function ResultsPage({
             )}
           </div>
 
-          {/* 修改後的圖表容器 */}
+          {/* 圖表容器 */}
           <div className="chart-container-wrapper">
             <div ref={chartRef} className="chart-container"></div>
           </div>
@@ -561,7 +555,7 @@ function ResultsPage({
         </CustomCard>
       </div>
 
-      {/* 詳細反應時間和計算結果表格--------------------------------------------------------------------------------------------------------- */}
+      {/* 詳細數據分析表格 */}
       <div className="mb-8">
         <CustomCard style={{ boxShadow: 'var(--box-shadow)' }}>
           <Title level={4}>
@@ -572,12 +566,10 @@ function ResultsPage({
           
         </CustomCard>
       </div>
-      {/* --------------------------------------------------------------------------------------------------------- */}
-
 
       <div className="text-center">
         <Paragraph style={{ fontSize: '1.125rem', marginBottom: -10 }} className="mb-6">
-          接下來，請您觀看一段的影片，並於觀看完畢後填寫問卷。
+          接下來，請您觀看兩部影片，並於觀看完畢後分別填寫問卷。
         </Paragraph>
         <div className="button-container">
           <Button
@@ -587,7 +579,7 @@ function ResultsPage({
             icon={<PlayCircleOutlined />}
             className="rounded-button large-button"
           >
-            觀看影片
+            觀看第一部影片
           </Button>
         </div>
       </div>
@@ -596,4 +588,3 @@ function ResultsPage({
 }
 
 export default ResultsPage;
-

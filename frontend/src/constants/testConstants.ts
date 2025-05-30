@@ -16,8 +16,10 @@ export const TEST_PHASES: Record<string, TestPhase> = {
   REVERSED_PRACTICE: 'reversed_practice',
   COMBINED_TEST_2: 'combined_test_2',
   RESULTS: 'results',
-  VIDEO: 'video',
-  SURVEY: 'survey',
+  VIDEO_A: 'video_a',      // 新增：影片A
+  SURVEY_A: 'survey_a',    // 新增：問卷A
+  VIDEO_B: 'video_b',      // 新增：影片B
+  SURVEY_B: 'survey_b',    // 新增：問卷B
   COMPLETED: 'completed'
 };
 
@@ -30,9 +32,11 @@ export const phaseProgress: Record<TestPhase, number> = {
   combined_test_1: 40,
   reversed_practice: 60,
   combined_test_2: 80,
-  results: 90,
-  video: 95,
-  survey: 100,
+  results: 85,
+  video_a: 88,       // 新增：影片A進度
+  survey_a: 91,      // 新增：問卷A進度
+  video_b: 94,       // 新增：影片B進度
+  survey_b: 97,      // 新增：問卷B進度
   completed: 100
 };
 
@@ -42,13 +46,12 @@ export const phaseInstructions: Record<TestPhase, { title: string; content: stri
   intro: { title: '', content: '' },
   gender_practice: {
     title: '性別分類練習',
-    // 使用<br />而不是\n，或使用CSS處理白空間
     content: `在這個階段，您需要對出現的詞語進行性別分類。
               請使用鍵盤按鍵：
               - 按 E 鍵：男性詞語（如：爸爸、男孩）
               - 按 I 鍵： 女性詞語（如：女孩、奶奶）
               請盡可能快速且準確地做出反應。`
-              },
+  },
   product_practice: {
     title: '產品分類練習',
     content: `在這個階段，您需要對出現的詞語進行產品類別分類。
@@ -56,7 +59,7 @@ export const phaseInstructions: Record<TestPhase, { title: string; content: stri
             - 按 E 鍵：電腦類產品（如：電競滑鼠、顯示卡）
             - 按 I 鍵： 護膚類產品（如：眼霜、乳液）
             請盡可能快速且準確地做出反應。`
-            },
+  },
   combined_test_1: {
     title: '聯合分類測試（第一階段）',
     content: `在這個階段，您需要同時對"性別詞語"和"產品詞語"進行分類。
@@ -64,7 +67,7 @@ export const phaseInstructions: Record<TestPhase, { title: string; content: stri
             - 按 E 鍵：男性詞語 或 電腦類產品
             - 按 I 鍵： 女性詞語 或 護膚類產品
             請盡可能快速且準確地做出反應。`
-              },
+  },
   reversed_practice: {
     title: '反向性別分類練習',
     content: `注意！分類方向已經改變。
@@ -72,7 +75,7 @@ export const phaseInstructions: Record<TestPhase, { title: string; content: stri
             - 按 E 鍵：女性詞語（如：女孩、奶奶）
             - 按 I 鍵： 男性詞語（如：爸爸、男孩）
             請盡可能快速且準確地做出反應。`
-              },
+  },
   combined_test_2: {
     title: '聯合分類測試（第二階段）',
     content: `在這個階段，您需要同時對"性別詞語"和"產品詞語"進行分類，但配對方式已改變。
@@ -80,9 +83,11 @@ export const phaseInstructions: Record<TestPhase, { title: string; content: stri
             - 按 E 鍵：女性詞語 或 電腦類產品
             - 按 I 鍵： 男性詞語 或 護膚類產品
             請盡可能快速且準確地做出反應。`
-              },
+  },
   results: { title: '', content: '' },
-  video: { title: '', content: '' },
-  survey: { title: '', content: '' },
+  video_a: { title: '', content: '' },    // 新增：影片A指引
+  survey_a: { title: '', content: '' },   // 新增：問卷A指引
+  video_b: { title: '', content: '' },    // 新增：影片B指引
+  survey_b: { title: '', content: '' },   // 新增：問卷B指引
   completed: { title: '', content: '' }
 };

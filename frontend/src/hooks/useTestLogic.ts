@@ -249,13 +249,19 @@ const useTestLogic = ({ maxTestCounts = {} }: UseTestLogicProps = {}) => {
         setCurrentPhase(TEST_PHASES.RESULTS);
         break;
       case TEST_PHASES.RESULTS:
-        setCurrentPhase(TEST_PHASES.VIDEO);
+        setCurrentPhase(TEST_PHASES.VIDEO_A); // 修改：進入影片A
         break;
-      case TEST_PHASES.VIDEO:
-        setCurrentPhase(TEST_PHASES.SURVEY);
+      case TEST_PHASES.VIDEO_A:
+        setCurrentPhase(TEST_PHASES.SURVEY_A); // 修改：進入問卷A
         break;
-      case TEST_PHASES.SURVEY:
-        setCurrentPhase(TEST_PHASES.COMPLETED);
+      case TEST_PHASES.SURVEY_A:
+        setCurrentPhase(TEST_PHASES.VIDEO_B); // 修改：進入影片B
+        break;
+      case TEST_PHASES.VIDEO_B:
+        setCurrentPhase(TEST_PHASES.SURVEY_B); // 修改：進入問卷B
+        break;
+      case TEST_PHASES.SURVEY_B:
+        setCurrentPhase(TEST_PHASES.COMPLETED); // 修改：完成測試
         break;
       default:
         setCurrentPhase(TEST_PHASES.START);
@@ -296,6 +302,7 @@ const useTestLogic = ({ maxTestCounts = {} }: UseTestLogicProps = {}) => {
     return result;
   };
 
+  // 獲取偏見結果後綴（保持原本的邏輯）
   const getBiasResultSuffix = (): string => {
     if (biasLevel === '無或極弱偏見') {
       return '_none';
