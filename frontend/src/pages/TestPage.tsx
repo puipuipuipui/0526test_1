@@ -30,6 +30,7 @@ function TestPage() {
     biasType,
     biasLevel,
     dScore,
+    getBiasResultSuffix,
     biasedProducts,
     // 新增加的IAT詳細分析數據
     biasDirection,
@@ -132,8 +133,11 @@ function TestPage() {
         );
       case TEST_PHASES.VIDEO:
         return <VideoPage onContinue={moveToNextPhase} />;
-      case TEST_PHASES.SURVEY:
-        return <SurveyPage onComplete={moveToNextPhase} />;
+        case TEST_PHASES.SURVEY:
+          return <SurveyPage 
+            onComplete={moveToNextPhase}
+            getBiasResultSuffix={getBiasResultSuffix} // 傳遞函數
+          />;
       case TEST_PHASES.COMPLETED:
         return <CompletedPage onRestart={handleRestart} />;
       default:

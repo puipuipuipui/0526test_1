@@ -6,9 +6,10 @@ const { Title, Paragraph, Text } = Typography;
 
 interface SurveyPageProps {
   onComplete: () => void;
+  getBiasResultSuffix?: () => string; // 新增這個 prop
 }
 
-function SurveyPage({ onComplete }: SurveyPageProps) {
+function SurveyPage({ onComplete, getBiasResultSuffix }: SurveyPageProps) {
   // 倒數計時器狀態
   const [countdown, setCountdown] = useState<number>(10);
   // 問卷開始填寫標記
@@ -20,24 +21,35 @@ function SurveyPage({ onComplete }: SurveyPageProps) {
   useEffect(() => {
     const userId = localStorage.getItem('userId');
     if (userId) {
-      // 🔥 在這裡設定你的問卷連結
+      // 獲取測試結果後綴
+      const resultSuffix = getBiasResultSuffix ? getBiasResultSuffix() : '_none';
       
-      // Google Forms 範例（替換成你的實際連結）
-      //https://docs.google.com/forms/d/e/1FAIpQLScGpRx--MVNEsdJAS4swRRlsNCJKxQwvefGiLMLKF2tV5ALpw/viewform?usp=pp_url&entry.1526772147=
-      const googleFormBaseUrl = 'https://docs.google.com/forms/d/e/1FAIpQLScGpRx--MVNEsdJAS4swRRlsNCJKxQwvefGiLMLKF2tV5ALpw/viewform?usp=pp_url&entry.1526772147=';
-      const googleFormWithUserId = `${googleFormBaseUrl}${userId}`;
+      // 根據測試結果選擇不同的問卷網址
+      let googleFormBaseUrl = '';
       
+      if (resultSuffix === '_girl') {
+        // 女性與電腦類偏見 - 使用電競滑鼠問卷
+        googleFormBaseUrl = 'https://docs.google.com/forms/d/e/1FAIpQLScGpRx--MVNEsdJAS4swRRlsNCJKxQwvefGiLMLKF2tV5ALpw/viewform?usp=pp_url&entry.1526772147=';
+      } else if (resultSuffix === '_boy') {
+        // 男性與護膚類偏見 - 使用面膜問卷
+        googleFormBaseUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSeeFuB-d1knFNPQvO0TlRQy8zGuwNf97ZPhQLBcDQPMa7fULA/viewform?usp=pp_url&entry.1526772147=';
+      } else {
+        // 無明顯偏見 - 使用預設問卷（電競滑鼠問卷）
+        googleFormBaseUrl = 'https://docs.google.com/forms/d/e/1FAIpQLScGpRx--MVNEsdJAS4swRRlsNCJKxQwvefGiLMLKF2tV5ALpw/viewform?usp=pp_url&entry.1526772147=';
+      }
       
-      // 🔥 選擇你要使用的平台
-      setSurveyUrl(googleFormWithUserId); // 或改成 surveyCakeWithUserId
+      const googleFormWithUserId = `${googleFormBaseUrl}${userId}${resultSuffix}`;
       
-      console.log('🔗 問卷連結已準備完成（包含用戶 ID）:', userId);
+      setSurveyUrl(googleFormWithUserId);
+      
+      console.log('🔗 問卷連結已準備完成（包含用戶 ID 和測試結果）:', `${userId}${resultSuffix}`);
+      console.log('📋 使用的問卷類型:', resultSuffix === '_girl' ? '女性問卷' : resultSuffix === '_boy' ? '男性問卷' : '預設問卷');
     } else {
       console.warn('⚠️  找不到用戶 ID，可能會影響資料匹配');
-      // 如果沒有 user ID，使用不含參數的連結
-      setSurveyUrl('https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform');
+      // 如果沒有 user ID，使用預設問卷
+      setSurveyUrl('https://docs.google.com/forms/d/e/1FAIpQLScGpRx--MVNEsdJAS4swRRlsNCJKxQwvefGiLMLKF2tV5ALpw/viewform');
     }
-  }, []);
+  }, [getBiasResultSuffix]);
 
   // 啟動倒數計時
   useEffect(() => {

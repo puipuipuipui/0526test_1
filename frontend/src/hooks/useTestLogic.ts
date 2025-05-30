@@ -48,7 +48,7 @@ const useTestLogic = ({ maxTestCounts = {} }: UseTestLogicProps = {}) => {
   const [dScore, setDScore] = useState<number>(0);
   const [biasedProducts, setBiasedProducts] = useState<Array<{ name: string, score: number }>>([]);
   const [usedWords, setUsedWords] = useState<Set<string>>(new Set());
-  
+
   // IAT分析詳細數據
   const [biasDirection, setBiasDirection] = useState<string>('');
   const [d1Score, setD1Score] = useState<number>(0);
@@ -271,7 +271,7 @@ const useTestLogic = ({ maxTestCounts = {} }: UseTestLogicProps = {}) => {
   // 計算偏見結果 - 使用標準IAT D分數演算法
   const calculateBiasResults = () => {
     const result = calculateDScore(testResults);
-    
+
     // 設置基本結果
     setDScore(result.dScore);
     setBiasLevel(result.biasLevel);
@@ -296,6 +296,20 @@ const useTestLogic = ({ maxTestCounts = {} }: UseTestLogicProps = {}) => {
     return result;
   };
 
+  const getBiasResultSuffix = (): string => {
+    if (biasLevel === '無或極弱偏見') {
+      return '_none';
+    }
+
+    if (biasType === 'gender_tech') {
+      return '_girl'; // 女性與電腦類偏見
+    } else if (biasType === 'gender_skincare') {
+      return '_boy';  // 男性與護膚類偏見
+    }
+
+    return '_none'; // 預設值
+  };
+
   return {
     currentPhase,
     currentWord,
@@ -315,6 +329,7 @@ const useTestLogic = ({ maxTestCounts = {} }: UseTestLogicProps = {}) => {
     d2Score,
     d3Score,
     d4Score,
+    getBiasResultSuffix,
     startNewTest,
     checkAnswer,
     moveToNextPhase,
