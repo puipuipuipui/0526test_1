@@ -3,8 +3,13 @@ import { TestResults } from '../types/testTypes';
 
 // API 基礎 URL 配置
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? '/api'  // 生產環境使用相對路徑
-  : 'http://localhost:5000/api';  // 開發環境使用完整 URL
+  ? 'https://your-backend-url.railway.app/api'  // 稍後替換成 Railway 提供的網址
+  : 'http://localhost:5000/api';  // 開發環境使用本地後端
+
+// // API 基礎 URL 配置
+// const API_BASE_URL = process.env.NODE_ENV === 'production' 
+//   ? '/api'  // 生產環境使用相對路徑
+//   : 'http://localhost:5000/api';  // 開發環境使用完整 URL
 
 // 定義測試結果資料介面
 interface TestResultData {
