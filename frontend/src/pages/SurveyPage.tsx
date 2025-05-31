@@ -156,9 +156,9 @@ function SurveyPage({ onComplete, surveyType, biasResultSuffix }: SurveyPageProp
               }}>
                 接下來請點選下方按鈕前往填寫問卷，您的回覆將有助於我們了解您在與聊天機器人互動過程中的想法與感受。整份問卷僅需數分鐘完成，請依據您的真實感受作答。
               </Paragraph>
-              <Text type="secondary" style={{ fontSize: '1rem' }}>
+              {/* <Text type="secondary" style={{ fontSize: '1rem' }}>
                 問卷類型：{getSurveyTypeDescription()}
-              </Text>
+              </Text> */}
             </div>
           </div>
           
