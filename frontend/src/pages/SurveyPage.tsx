@@ -12,7 +12,7 @@ interface SurveyPageProps {
 
 function SurveyPage({ onComplete, surveyType, biasResultSuffix }: SurveyPageProps) {
   // 倒數計時器狀態
-  const [countdown, setCountdown] = useState<number>(10);
+  const [countdown, setCountdown] = useState<number>(60);
   // 問卷開始填寫標記
   const [surveyStarted, setSurveyStarted] = useState<boolean>(true);
   // 問卷 URL（包含隱藏的 user ID）

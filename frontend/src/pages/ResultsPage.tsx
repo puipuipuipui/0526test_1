@@ -581,7 +581,7 @@ function ResultsPage({
       </div>
 
       {/* 詳細數據分析表格 */}
-      <div className="mb-8">
+      <div className="mb-8"  style={{ display: 'none' }}>
         <CustomCard style={{ boxShadow: 'var(--box-shadow)' }}>
           <Title level={4}>
             <BarChartOutlined /> 詳細數據分析

@@ -14,7 +14,7 @@ function VideoPage({ onContinue, videoType, biasResultSuffix }: VideoPageProps) 
   // 控制注意事項彈窗顯示
   const [noticeVisible, setNoticeVisible] = useState<boolean>(true);
   // 倒數計時器狀態
-  const [countdown, setCountdown] = useState<number>(10);
+  const [countdown, setCountdown] = useState<number>(60);
   // 影片觀看時間追蹤
   const [videoStarted, setVideoStarted] = useState<boolean>(false);
 
