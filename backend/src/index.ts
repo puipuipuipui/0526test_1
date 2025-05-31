@@ -13,7 +13,7 @@ const app = express();
 // 中間件
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://yourdomain.com'] // 替換為你的正式域名
+    ? ['https://gender-bias-study.netlify.app'] // 替換為你的正式域名
     : ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:3001'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
