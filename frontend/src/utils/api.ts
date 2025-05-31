@@ -3,7 +3,7 @@ import { TestResults } from '../types/testTypes';
 
 // API 基礎 URL 配置
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://your-backend-url.railway.app/api'  // 稍後替換成 Railway 提供的網址
+  ? 'https://0526test1-production.up.railway.app/api'  // 稍後替換成 Railway 提供的網址
   : 'http://localhost:5000/api';  // 開發環境使用本地後端
 
 // // API 基礎 URL 配置
