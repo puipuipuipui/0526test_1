@@ -12,7 +12,7 @@
 /frontend/coverage
 
 # production
-/build
+# /build
 /frontend/build
 /backend/dist
 
