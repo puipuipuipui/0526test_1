@@ -249,13 +249,19 @@ const useTestLogic = ({ maxTestCounts = {} }: UseTestLogicProps = {}) => {
         setCurrentPhase(TEST_PHASES.RESULTS);
         break;
       case TEST_PHASES.RESULTS:
-        setCurrentPhase(TEST_PHASES.VIDEO);
+        setCurrentPhase(TEST_PHASES.VIDEO_A); // 修改：進入影片A
         break;
-      case TEST_PHASES.VIDEO:
-        setCurrentPhase(TEST_PHASES.SURVEY);
+      case TEST_PHASES.VIDEO_A:
+        setCurrentPhase(TEST_PHASES.SURVEY_A); // 修改：進入問卷A
         break;
-      case TEST_PHASES.SURVEY:
-        setCurrentPhase(TEST_PHASES.COMPLETED);
+      case TEST_PHASES.SURVEY_A:
+        setCurrentPhase(TEST_PHASES.VIDEO_B); // 修改：進入影片B
+        break;
+      case TEST_PHASES.VIDEO_B:
+        setCurrentPhase(TEST_PHASES.SURVEY_B); // 修改：進入問卷B
+        break;
+      case TEST_PHASES.SURVEY_B:
+        setCurrentPhase(TEST_PHASES.COMPLETED); // 修改：完成測試
         break;
       default:
         setCurrentPhase(TEST_PHASES.START);
@@ -296,18 +302,51 @@ const useTestLogic = ({ maxTestCounts = {} }: UseTestLogicProps = {}) => {
     return result;
   };
 
+  // 獲取偏見結果後綴 - 修改邏輯以支援新的需求
   const getBiasResultSuffix = (): string => {
-    if (biasLevel === '無或極弱偏見') {
-      return '_none';
+    // 如果有明顯偏見，直接使用原本的邏輯
+    if (biasLevel !== '無或極弱偏見') {
+      if (biasType === 'gender_tech') {
+        return '_girl'; // 女性與電腦類偏見
+      } else if (biasType === 'gender_skincare') {
+        return '_boy';  // 男性與護膚類偏見
+      }
     }
 
-    if (biasType === 'gender_tech') {
-      return '_girl'; // 女性與電腦類偏見
-    } else if (biasType === 'gender_skincare') {
-      return '_boy';  // 男性與護膚類偏見
+    // 如果沒有明顯偏見，則使用D值分數最高的類別來決定
+    const d1Abs = Math.abs(d1Score); // 性別-電腦類聯想
+    const d2Abs = Math.abs(d2Score); // 性別-護膚類聯想
+    const d3Abs = Math.abs(d3Score); // 男性-產品類別聯想
+    const d4Abs = Math.abs(d4Score); // 女性-產品類別聯想
+
+    // 找出最大的D分數絕對值
+    const maxD = Math.max(d1Abs, d2Abs, d3Abs, d4Abs);
+
+    // 根據最大D分數來決定類別
+    if (maxD === d1Abs && d1Score !== 0) {
+      // D1最大 - 性別-電腦類聯想最強
+      return '_girl'; // 視為女性與電腦類相關
+    } else if (maxD === d2Abs && d2Score !== 0) {
+      // D2最大 - 性別-護膚類聯想最強
+      return '_boy'; // 視為男性與護膚類相關
+    } else if (maxD === d3Abs && d3Score !== 0) {
+      // D3最大 - 男性-產品類別聯想最強
+      if (d3Score > 0) {
+        return '_boy'; // 男性與護膚類
+      } else {
+        return '_girl'; // 男性與電腦類（反向，但歸類為電腦類相關）
+      }
+    } else if (maxD === d4Abs && d4Score !== 0) {
+      // D4最大 - 女性-產品類別聯想最強
+      if (d4Score > 0) {
+        return '_girl'; // 女性與電腦類
+      } else {
+        return '_boy'; // 女性與護膚類（反向，但歸類為護膚類相關）
+      }
     }
 
-    return '_none'; // 預設值
+    // 如果所有D分數都很小或為0，預設使用女性與電腦類
+    return '_girl';
   };
 
   return {

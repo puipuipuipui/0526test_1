@@ -14,7 +14,7 @@ function Header({ currentPhase }: HeaderProps) {
     <div className="header">
       <div className="header-container">
         <div className="header-top">
-          <Title level={4} style={{ margin: 0 }}>性別與商品偏見測試<br/></Title>
+          <Title level={4} style={{ margin: 0 }}>擬人化機器人性別設計與產品刻板印象對購買意圖的影響<br/></Title>
           <Text className="date-text">
             {new Date().toLocaleDateString('zh-TW', { 
               year: 'numeric', 

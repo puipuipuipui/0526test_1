@@ -8,8 +8,10 @@ export type TestPhase =
   | 'reversed_practice'
   | 'combined_test_2'
   | 'results'
-  | 'video'
-  | 'survey'
+  | 'video_a'      // 新增：影片A
+  | 'survey_a'     // 新增：問卷A
+  | 'video_b'      // 新增：影片B
+  | 'survey_b'     // 新增：問卷B
   | 'completed';
 
 // 詞彙類型定義

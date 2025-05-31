@@ -6,10 +6,11 @@ const { Title, Paragraph, Text } = Typography;
 
 interface SurveyPageProps {
   onComplete: () => void;
-  getBiasResultSuffix?: () => string; // 新增這個 prop
+  surveyType: 'A' | 'B'; // 區分是問卷A還是問卷B
+  biasResultSuffix?: string; // 傳入偏見結果後綴
 }
 
-function SurveyPage({ onComplete, getBiasResultSuffix }: SurveyPageProps) {
+function SurveyPage({ onComplete, surveyType, biasResultSuffix }: SurveyPageProps) {
   // 倒數計時器狀態
   const [countdown, setCountdown] = useState<number>(10);
   // 問卷開始填寫標記
@@ -17,39 +18,44 @@ function SurveyPage({ onComplete, getBiasResultSuffix }: SurveyPageProps) {
   // 問卷 URL（包含隱藏的 user ID）
   const [surveyUrl, setSurveyUrl] = useState<string>('');
 
-  // 建構問卷 URL（包含隱藏的 user ID）
+  // 建構問卷 URL
   useEffect(() => {
     const userId = localStorage.getItem('userId');
     if (userId) {
-      // 獲取測試結果後綴
-      const resultSuffix = getBiasResultSuffix ? getBiasResultSuffix() : '_none';
-      
-      // 根據測試結果選擇不同的問卷網址
       let googleFormBaseUrl = '';
-      
-      if (resultSuffix === '_girl') {
-        // 女性與電腦類偏見 - 使用電競滑鼠問卷
+      let userIdSuffix = '';
+
+      // 判斷是女性與電腦類偏見還是男性與護膚類偏見
+      const isFemaleComputerBias = biasResultSuffix === '_girl';
+      const isMaleSkinceBias = biasResultSuffix === '_boy';
+
+      if (isFemaleComputerBias) {
+        // 測驗結果為「女性與電腦類」偏見 - 兩個問卷都使用電競滑鼠問卷
         googleFormBaseUrl = 'https://docs.google.com/forms/d/e/1FAIpQLScGpRx--MVNEsdJAS4swRRlsNCJKxQwvefGiLMLKF2tV5ALpw/viewform?usp=pp_url&entry.1526772147=';
-      } else if (resultSuffix === '_boy') {
-        // 男性與護膚類偏見 - 使用面膜問卷
+        userIdSuffix = `${userId}_girl_${surveyType}`;
+      } else if (isMaleSkinceBias) {
+        // 測驗結果為「男性與護膚類」偏見 - 兩個問卷都使用面膜問卷
         googleFormBaseUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSeeFuB-d1knFNPQvO0TlRQy8zGuwNf97ZPhQLBcDQPMa7fULA/viewform?usp=pp_url&entry.1526772147=';
+        userIdSuffix = `${userId}_boy_${surveyType}`;
       } else {
-        // 無明顯偏見 - 使用預設問卷（電競滑鼠問卷）
+        // 測驗結果為「沒有明顯的性別商品偏見」- 預設使用電競滑鼠問卷
         googleFormBaseUrl = 'https://docs.google.com/forms/d/e/1FAIpQLScGpRx--MVNEsdJAS4swRRlsNCJKxQwvefGiLMLKF2tV5ALpw/viewform?usp=pp_url&entry.1526772147=';
+        userIdSuffix = `${userId}_none_${surveyType}`;
       }
       
-      const googleFormWithUserId = `${googleFormBaseUrl}${userId}${resultSuffix}`;
-      
+      const googleFormWithUserId = `${googleFormBaseUrl}${userIdSuffix}`;
       setSurveyUrl(googleFormWithUserId);
       
-      console.log('🔗 問卷連結已準備完成（包含用戶 ID 和測試結果）:', `${userId}${resultSuffix}`);
-      console.log('📋 使用的問卷類型:', resultSuffix === '_girl' ? '女性問卷' : resultSuffix === '_boy' ? '男性問卷' : '預設問卷');
+      console.log(`🔗 第${surveyType === 'A' ? '一' : '二'}份問卷連結已準備完成:`, userIdSuffix);
+      console.log(`📋 第${surveyType === 'A' ? '一' : '二'}份問卷類型:`, 
+        (isFemaleComputerBias || (!isFemaleComputerBias && !isMaleSkinceBias)) ? '電競滑鼠問卷' : '面膜問卷'
+      );
     } else {
       console.warn('⚠️  找不到用戶 ID，可能會影響資料匹配');
       // 如果沒有 user ID，使用預設問卷
       setSurveyUrl('https://docs.google.com/forms/d/e/1FAIpQLScGpRx--MVNEsdJAS4swRRlsNCJKxQwvefGiLMLKF2tV5ALpw/viewform');
     }
-  }, [getBiasResultSuffix]);
+  }, [surveyType, biasResultSuffix]);
 
   // 啟動倒數計時
   useEffect(() => {
@@ -66,9 +72,48 @@ function SurveyPage({ onComplete, getBiasResultSuffix }: SurveyPageProps) {
     };
   }, [surveyStarted, countdown]);
 
+  // 獲取標題
+  const getTitle = (): string => {
+    return `第${surveyType === 'A' ? '一' : '二'}份問卷調查`;
+  };
+
+  // 獲取按鈕文字
+  const getButtonText = (): string => {
+    if (surveyType === 'A') {
+      return countdown > 0 ? `觀看第二部影片 (${countdown}s)` : '觀看第二部影片';
+    } else {
+      return countdown > 0 ? `完成測試 (${countdown}s)` : '完成測試';
+    }
+  };
+
+  // 獲取說明文字
+  const getDescriptionText = (): string => {
+    if (surveyType === 'A') {
+      return '填寫完問卷後，請點擊以下按鈕觀看第二部影片';
+    } else {
+      return '填寫完問卷後，請點擊以下按鈕完成測試';
+    }
+  };
+
+  // 獲取問卷類型說明
+  const getSurveyTypeDescription = (): string => {
+    const isFemaleComputerBias = biasResultSuffix === '_girl';
+    const isMaleSkinceBias = biasResultSuffix === '_boy';
+
+    if (isFemaleComputerBias) {
+      return '電競滑鼠相關問卷';
+    } else if (isMaleSkinceBias) {
+      return '面膜相關問卷';
+    } else {
+      return '電競滑鼠相關問卷（預設）';
+    }
+  };
+
   return (
     <div className="content-container">
-      <Title level={2} className="text-center" style={{ marginBottom: '32px' }}>問卷調查</Title>
+      <Title level={2} className="text-center" style={{ marginBottom: '32px' }}>
+        {getTitle()}
+      </Title>
       
       <Card 
         className="survey-card"
@@ -107,10 +152,13 @@ function SurveyPage({ onComplete, getBiasResultSuffix }: SurveyPageProps) {
                 fontSize: '1.125rem', 
                 lineHeight: '1.6', 
                 color: 'rgba(0, 0, 0, 0.75)',
-                marginBottom: '0'
+                marginBottom: '12px'
               }}>
                 接下來請點選下方按鈕前往填寫問卷，您的回覆將有助於我們了解您在與聊天機器人互動過程中的想法與感受。整份問卷僅需數分鐘完成，請依據您的真實感受作答。
               </Paragraph>
+              <Text type="secondary" style={{ fontSize: '1rem' }}>
+                問卷類型：{getSurveyTypeDescription()}
+              </Text>
             </div>
           </div>
           
@@ -132,7 +180,7 @@ function SurveyPage({ onComplete, getBiasResultSuffix }: SurveyPageProps) {
               }}
               disabled={!surveyUrl}
             >
-              填寫問卷
+              填寫第{surveyType === 'A' ? '一' : '二'}份問卷
             </Button>
           </div>
         </Space>
@@ -151,7 +199,7 @@ function SurveyPage({ onComplete, getBiasResultSuffix }: SurveyPageProps) {
       }}>
         <Text type="secondary" style={{ marginBottom: '16px', display: 'flex', alignItems: 'center' }}>
           <ClockCircleOutlined style={{ marginRight: '8px' }} /> 
-          填寫完問卷後，請點擊以下按鈕完成測試
+          {getDescriptionText()}
         </Text>
         
         <Button
@@ -159,7 +207,7 @@ function SurveyPage({ onComplete, getBiasResultSuffix }: SurveyPageProps) {
           size="large"
           onClick={onComplete}
           disabled={countdown > 0}
-          icon={<ArrowRightOutlined />}
+          icon={surveyType === 'A' ? <ArrowRightOutlined /> : <ArrowRightOutlined />}
           style={{ 
             minWidth: '160px',
             height: '44px',
@@ -168,7 +216,7 @@ function SurveyPage({ onComplete, getBiasResultSuffix }: SurveyPageProps) {
             boxShadow: countdown > 0 ? 'none' : '0 2px 0 rgba(0, 0, 0, 0.05)'
           }}
         >
-          {countdown > 0 ? `完成測試 (${countdown})` : '完成測試'}
+          {getButtonText()}
         </Button>
       </div>
     </div>

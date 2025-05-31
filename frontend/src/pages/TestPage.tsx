@@ -13,11 +13,6 @@ import CompletedPage from './CompletedPage';
 
 function TestPage() {
   // 設置不同階段的測試次數
-  // 第一次: 10 (gender_practice)
-  // 第二次: 10 (product_practice)
-  // 第三次: 20 (combined_test_1)
-  // 第四次: 10 (reversed_practice)
-  // 第五次: 20 (combined_test_2)
   const {
     currentPhase,
     currentWord,
@@ -25,14 +20,14 @@ function TestPage() {
     feedback,
     testResults,
     testCount,
-    maxTestCount, // 現在會根據當前階段返回對應的值
+    maxTestCount,
     showInstructions,
     biasType,
     biasLevel,
     dScore,
     getBiasResultSuffix,
     biasedProducts,
-    // 新增加的IAT詳細分析數據
+    // IAT詳細分析數據
     biasDirection,
     d1Score,
     d2Score,
@@ -78,7 +73,6 @@ function TestPage() {
   // 重新開始測試的處理函數
   const handleRestart = () => {
     startNewTest();
-    // 回到開始頁面
   };
 
   // 渲染當前階段
@@ -107,7 +101,7 @@ function TestPage() {
                 currentWord={currentWord}
                 feedback={feedback}
                 testCount={testCount}
-                maxTestCount={maxTestCount} // 動態根據當前階段取得對應的最大測試次數
+                maxTestCount={maxTestCount}
                 showInstructions={showInstructions}
                 onStartTest={startTest}
               />
@@ -122,7 +116,6 @@ function TestPage() {
             biasLevel={biasLevel}
             dScore={dScore}
             biasedProducts={biasedProducts}
-            // 傳遞新增加的IAT詳細分析數據
             biasDirection={biasDirection}
             d1={d1Score}
             d2={d2Score}
@@ -131,13 +124,38 @@ function TestPage() {
             onContinue={moveToNextPhase}
           />
         );
-      case TEST_PHASES.VIDEO:
-        return <VideoPage onContinue={moveToNextPhase} />;
-        case TEST_PHASES.SURVEY:
-          return <SurveyPage 
+      case TEST_PHASES.VIDEO_A: // 新增：影片A
+        return (
+          <VideoPage 
+            onContinue={moveToNextPhase} 
+            videoType="A"
+            biasResultSuffix={getBiasResultSuffix()}
+          />
+        );
+      case TEST_PHASES.SURVEY_A: // 新增：問卷A
+        return (
+          <SurveyPage 
             onComplete={moveToNextPhase}
-            getBiasResultSuffix={getBiasResultSuffix} // 傳遞函數
-          />;
+            surveyType="A"
+            biasResultSuffix={getBiasResultSuffix()}
+          />
+        );
+      case TEST_PHASES.VIDEO_B: // 新增：影片B
+        return (
+          <VideoPage 
+            onContinue={moveToNextPhase} 
+            videoType="B"
+            biasResultSuffix={getBiasResultSuffix()}
+          />
+        );
+      case TEST_PHASES.SURVEY_B: // 新增：問卷B
+        return (
+          <SurveyPage 
+            onComplete={moveToNextPhase}
+            surveyType="B"
+            biasResultSuffix={getBiasResultSuffix()}
+          />
+        );
       case TEST_PHASES.COMPLETED:
         return <CompletedPage onRestart={handleRestart} />;
       default:

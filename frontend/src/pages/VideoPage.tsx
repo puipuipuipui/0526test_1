@@ -6,9 +6,11 @@ const { Title, Paragraph, Text } = Typography;
 
 interface VideoPageProps {
   onContinue: () => void;
+  videoType: 'A' | 'B'; // 區分是影片A還是影片B
+  biasResultSuffix?: string; // 傳入偏見結果後綴
 }
 
-function VideoPage({ onContinue }: VideoPageProps) {
+function VideoPage({ onContinue, videoType, biasResultSuffix }: VideoPageProps) {
   // 控制注意事項彈窗顯示
   const [noticeVisible, setNoticeVisible] = useState<boolean>(true);
   // 倒數計時器狀態
@@ -37,9 +39,77 @@ function VideoPage({ onContinue }: VideoPageProps) {
     };
   }, [videoStarted, countdown]);
 
+  // 根據影片類型和偏見結果決定影片內容
+  const getVideoUrl = (): string => {
+    // 判斷是女性與電腦類偏見還是男性與護膚類偏見
+    const isFemaleComputerBias = biasResultSuffix === '_girl';
+    const isMaleSkinceBias = biasResultSuffix === '_boy';
+    
+    if (isFemaleComputerBias) {
+      // 測驗結果為「女性與電腦類」偏見
+      if (videoType === 'A') {
+        // 影片A：女性與電腦類產品
+        return 'https://www.youtube.com/embed/psatUihARNo';
+      } else {
+        // 影片B：男性與電腦類產品
+        return 'https://www.youtube.com/embed/UWMJH6yP6PU';
+      }
+    } else if (isMaleSkinceBias) {
+      // 測驗結果為「男性與護膚類」偏見
+      if (videoType === 'A') {
+        // 影片A：男性與護膚類產品
+        return 'https://www.youtube.com/embed/Mu7lAiFhQjU';
+      } else {
+        // 影片B：女性與護膚類產品
+        return 'https://www.youtube.com/embed/ICBFSZzBFyY';
+      }
+    } else {
+      // 測驗結果為「沒有明顯的性別商品偏見」- 使用預設邏輯（女性與電腦類）
+      if (videoType === 'A') {
+        // 影片A：女性與電腦類產品
+        return 'https://www.youtube.com/embed/psatUihARNo';
+      } else {
+        // 影片B：男性與電腦類產品
+        return 'https://www.youtube.com/embed/UWMJH6yP6PU';
+      }
+    }
+  };
+
+  // 獲取影片標題
+  const getVideoTitle = (): string => {
+    const isFemaleComputerBias = biasResultSuffix === '_girl';
+    const isMaleSkinceBias = biasResultSuffix === '_boy';
+    
+    if (isFemaleComputerBias) {
+      if (videoType === 'A') {
+        return '第一部聊天機器人互動影片（女性與電腦產品）';
+      } else {
+        return '第二部聊天機器人互動影片（男性與電腦產品）';
+      }
+    } else if (isMaleSkinceBias) {
+      if (videoType === 'A') {
+        return '第一部聊天機器人互動影片（男性與護膚產品）';
+      } else {
+        return '第二部聊天機器人互動影片（女性與護膚產品）';
+      }
+    } else {
+      if (videoType === 'A') {
+        return '第一部聊天機器人互動影片（女性與電腦產品）';
+      } else {
+        return '第二部聊天機器人互動影片（男性與電腦產品）';
+      }
+    }
+  };
+
+  // 獲取按鈕文字
+  const getButtonText = (): string => {
+    const suffix = videoType === 'A' ? '第一份問卷調查' : '第二份問卷調查';
+    return countdown > 0 ? `前往${suffix} (${countdown}s)` : `前往${suffix}`;
+  };
+
   return (
     <div className="wide-container">
-      {/* 影片注意事項彈跳視窗 */}
+      {/* 影片注意事項彈跳視窗 - 修正 bodyStyle 為 styles.body */}
       <Modal
         title={
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 0' }}>
@@ -68,10 +138,12 @@ function VideoPage({ onContinue }: VideoPageProps) {
         centered
         maskClosable={false}
         width={600}
-        bodyStyle={{
-          padding: '24px 28px',
-          backgroundColor: '#fafafa',
-          borderRadius: '0 0 8px 8px'
+        styles={{
+          body: {
+            padding: '24px 28px',
+            backgroundColor: '#fafafa',
+            borderRadius: '0 0 8px 8px'
+          }
         }}
         style={{
           borderRadius: '8px',
@@ -156,14 +228,14 @@ function VideoPage({ onContinue }: VideoPageProps) {
         </div>
       </Modal>
 
-      <Title level={2} className="text-center mb-6">觀看影片</Title>
+      <Title level={2} className="text-center mb-6">觀看第{videoType === 'A' ? '一' : '二'}部影片</Title>
       <Paragraph className="text-center mb-6" style={{ fontSize: '1.125rem' }}>
         請觀看以下關於聊天機器人互動的影片，並想像您是影片中的使用者。
       </Paragraph>
       <div className="video-container">
         <iframe
-          src="https://www.youtube.com/embed/dQw4w9WgXcQ" // 替換為實際視頻鏈接
-          title="聊天機器人互動影片"
+          src={getVideoUrl()}
+          title={getVideoTitle()}
           className="video-iframe"
           allowFullScreen
         ></iframe>
@@ -181,7 +253,7 @@ function VideoPage({ onContinue }: VideoPageProps) {
             className="rounded-button large-button"
             disabled={countdown > 0}
           >
-            {countdown > 0 ? `前往問卷調查 (${countdown})` : '前往問卷調查'}
+            {getButtonText()}
           </Button>
         </div>
       </div>

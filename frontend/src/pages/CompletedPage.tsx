@@ -25,6 +25,10 @@ function CompletedPage({ onRestart }: CompletedPageProps) {
             您的回覆對我們的研究非常重要，將有助於深入了解人們在與聊天機器人互動時的感受與反應。<br />
             若您對本實驗有任何疑問，歡迎與研究團隊聯繫。再次感謝您的寶貴時間！
           </Paragraph>
+          <Paragraph className="mb-6" style={{ textAlign: 'left', fontSize: '1.125rem', maxWidth: '800px', margin: '0 auto 24px' }}>
+            聯絡信箱：jessica910513@gmail.com<br />
+            聯絡人：林鈺憓 國立高雄科技大學智慧商務研究所 碩士生
+          </Paragraph>
           {/* <div className="button-container">
             <Button
               type="primary"
