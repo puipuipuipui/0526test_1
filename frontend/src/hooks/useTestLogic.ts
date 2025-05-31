@@ -1,3 +1,5 @@
+// frontend/src/hooks/useTestLogic.ts - 修正版本
+
 import { useState, useEffect } from 'react';
 import { TestPhase, WordType, Side, TestResults, FeedbackType } from '../types/testTypes';
 import { TEST_PHASES, maleWords, femaleWords, computerWords, skinCareWords } from '../constants/testConstants';
@@ -5,11 +7,11 @@ import { calculateDScore, generateBiasedProducts } from '../utils/biasCalculatio
 
 interface UseTestLogicProps {
   maxTestCounts?: {
-    gender_practice?: number; // 第一階段：性別練習
-    product_practice?: number; // 第二階段：產品練習
-    combined_test_1?: number; // 第三階段：組合測試1
-    reversed_practice?: number; // 第四階段：反向練習
-    combined_test_2?: number; // 第五階段：組合測試2
+    gender_practice?: number;
+    product_practice?: number;
+    combined_test_1?: number;
+    reversed_practice?: number;
+    combined_test_2?: number;
   };
 }
 
@@ -30,7 +32,7 @@ interface BiasResults {
 }
 
 const useTestLogic = ({ maxTestCounts = {} }: UseTestLogicProps = {}) => {
-  const [currentPhase, setCurrentPhase] = useState<TestPhase>(TEST_PHASES.START);
+  const [currentPhase, setCurrentPhase] = useState<TestPhase>('start');
   const [currentWord, setCurrentWord] = useState<string>('');
   const [currentWordType, setCurrentWordType] = useState<WordType | ''>('');
   const [feedback, setFeedback] = useState<FeedbackType>('');
@@ -58,22 +60,22 @@ const useTestLogic = ({ maxTestCounts = {} }: UseTestLogicProps = {}) => {
 
   // 根據當前階段獲取最大測試次數
   const getMaxTestCount = (phase: TestPhase): number => {
-    // 預設值
-    const defaults = {
-      [TEST_PHASES.GENDER_PRACTICE]: 10,
-      [TEST_PHASES.PRODUCT_PRACTICE]: 10,
-      [TEST_PHASES.COMBINED_TEST_1]: 20,
-      [TEST_PHASES.REVERSED_PRACTICE]: 10,
-      [TEST_PHASES.COMBINED_TEST_2]: 20
+    // 預設值 - 使用類型安全的方式
+    const defaults: Record<string, number> = {
+      'gender_practice': 10,
+      'product_practice': 10,
+      'combined_test_1': 20,
+      'reversed_practice': 10,
+      'combined_test_2': 20
     };
 
     // 用戶設定的值（如果有）
-    const userSettings = {
-      [TEST_PHASES.GENDER_PRACTICE]: maxTestCounts.gender_practice,
-      [TEST_PHASES.PRODUCT_PRACTICE]: maxTestCounts.product_practice,
-      [TEST_PHASES.COMBINED_TEST_1]: maxTestCounts.combined_test_1,
-      [TEST_PHASES.REVERSED_PRACTICE]: maxTestCounts.reversed_practice,
-      [TEST_PHASES.COMBINED_TEST_2]: maxTestCounts.combined_test_2
+    const userSettings: Record<string, number | undefined> = {
+      'gender_practice': maxTestCounts.gender_practice,
+      'product_practice': maxTestCounts.product_practice,
+      'combined_test_1': maxTestCounts.combined_test_1,
+      'reversed_practice': maxTestCounts.reversed_practice,
+      'combined_test_2': maxTestCounts.combined_test_2
     };
 
     // 返回用戶設定的值或預設值
@@ -94,19 +96,19 @@ const useTestLogic = ({ maxTestCounts = {} }: UseTestLogicProps = {}) => {
     let isCorrect = false;
 
     // 檢查答案是否正確
-    if (currentPhase === TEST_PHASES.GENDER_PRACTICE) {
+    if (currentPhase === 'gender_practice') {
       isCorrect = (side === 'left' && maleWords.includes(currentWord)) ||
         (side === 'right' && femaleWords.includes(currentWord));
-    } else if (currentPhase === TEST_PHASES.PRODUCT_PRACTICE) {
+    } else if (currentPhase === 'product_practice') {
       isCorrect = (side === 'left' && computerWords.includes(currentWord)) ||
         (side === 'right' && skinCareWords.includes(currentWord));
-    } else if (currentPhase === TEST_PHASES.COMBINED_TEST_1) {
+    } else if (currentPhase === 'combined_test_1') {
       isCorrect = (side === 'left' && (maleWords.includes(currentWord) || computerWords.includes(currentWord))) ||
         (side === 'right' && (femaleWords.includes(currentWord) || skinCareWords.includes(currentWord)));
-    } else if (currentPhase === TEST_PHASES.REVERSED_PRACTICE) {
+    } else if (currentPhase === 'reversed_practice') {
       isCorrect = (side === 'left' && femaleWords.includes(currentWord)) ||
         (side === 'right' && maleWords.includes(currentWord));
-    } else if (currentPhase === TEST_PHASES.COMBINED_TEST_2) {
+    } else if (currentPhase === 'combined_test_2') {
       isCorrect = (side === 'left' && (femaleWords.includes(currentWord) || computerWords.includes(currentWord))) ||
         (side === 'right' && (maleWords.includes(currentWord) || skinCareWords.includes(currentWord)));
     }
@@ -117,7 +119,7 @@ const useTestLogic = ({ maxTestCounts = {} }: UseTestLogicProps = {}) => {
     // 如果答案正確
     if (isCorrect) {
       // 記錄反應時間
-      if (currentPhase === TEST_PHASES.COMBINED_TEST_1) {
+      if (currentPhase === 'combined_test_1') {
         // 區組1：男性+電腦類或女性+護膚類
         if (maleWords.includes(currentWord) || computerWords.includes(currentWord)) {
           setTestResults(prev => ({
@@ -130,7 +132,7 @@ const useTestLogic = ({ maxTestCounts = {} }: UseTestLogicProps = {}) => {
             femaleSkincare: [...prev.femaleSkincare, reactionTime]
           }));
         }
-      } else if (currentPhase === TEST_PHASES.COMBINED_TEST_2) {
+      } else if (currentPhase === 'combined_test_2') {
         // 區組2：女性+電腦類或男性+護膚類
         if (femaleWords.includes(currentWord) || computerWords.includes(currentWord)) {
           setTestResults(prev => ({
@@ -173,13 +175,13 @@ const useTestLogic = ({ maxTestCounts = {} }: UseTestLogicProps = {}) => {
   const selectNextWord = () => {
     let wordPool: string[] = [];
 
-    if (currentPhase === TEST_PHASES.GENDER_PRACTICE) {
+    if (currentPhase === 'gender_practice') {
       wordPool = [...maleWords, ...femaleWords];
-    } else if (currentPhase === TEST_PHASES.PRODUCT_PRACTICE) {
+    } else if (currentPhase === 'product_practice') {
       wordPool = [...computerWords, ...skinCareWords];
-    } else if (currentPhase === TEST_PHASES.COMBINED_TEST_1 || currentPhase === TEST_PHASES.COMBINED_TEST_2) {
+    } else if (currentPhase === 'combined_test_1' || currentPhase === 'combined_test_2') {
       wordPool = [...maleWords, ...femaleWords, ...computerWords, ...skinCareWords];
-    } else if (currentPhase === TEST_PHASES.REVERSED_PRACTICE) {
+    } else if (currentPhase === 'reversed_practice') {
       wordPool = [...maleWords, ...femaleWords];
     }
 
@@ -220,51 +222,51 @@ const useTestLogic = ({ maxTestCounts = {} }: UseTestLogicProps = {}) => {
   // 進入下一個測試階段
   const moveToNextPhase = () => {
     switch (currentPhase) {
-      case TEST_PHASES.START:
-        setCurrentPhase(TEST_PHASES.INTRO);
+      case 'start':
+        setCurrentPhase('intro');
         break;
-      case TEST_PHASES.INTRO:
-        setCurrentPhase(TEST_PHASES.GENDER_PRACTICE);
+      case 'intro':
+        setCurrentPhase('gender_practice');
         startNewTest();
         break;
-      case TEST_PHASES.GENDER_PRACTICE:
-        setCurrentPhase(TEST_PHASES.PRODUCT_PRACTICE);
+      case 'gender_practice':
+        setCurrentPhase('product_practice');
         startNewTest();
         break;
-      case TEST_PHASES.PRODUCT_PRACTICE:
-        setCurrentPhase(TEST_PHASES.COMBINED_TEST_1);
+      case 'product_practice':
+        setCurrentPhase('combined_test_1');
         startNewTest();
         break;
-      case TEST_PHASES.COMBINED_TEST_1:
-        setCurrentPhase(TEST_PHASES.REVERSED_PRACTICE);
+      case 'combined_test_1':
+        setCurrentPhase('reversed_practice');
         startNewTest();
         break;
-      case TEST_PHASES.REVERSED_PRACTICE:
-        setCurrentPhase(TEST_PHASES.COMBINED_TEST_2);
+      case 'reversed_practice':
+        setCurrentPhase('combined_test_2');
         startNewTest();
         break;
-      case TEST_PHASES.COMBINED_TEST_2:
+      case 'combined_test_2':
         // 在進入結果頁面前計算結果
         calculateBiasResults();
-        setCurrentPhase(TEST_PHASES.RESULTS);
+        setCurrentPhase('results');
         break;
-      case TEST_PHASES.RESULTS:
-        setCurrentPhase(TEST_PHASES.VIDEO_A); // 修改：進入影片A
+      case 'results':
+        setCurrentPhase('video_a');
         break;
-      case TEST_PHASES.VIDEO_A:
-        setCurrentPhase(TEST_PHASES.SURVEY_A); // 修改：進入問卷A
+      case 'video_a':
+        setCurrentPhase('survey_a');
         break;
-      case TEST_PHASES.SURVEY_A:
-        setCurrentPhase(TEST_PHASES.VIDEO_B); // 修改：進入影片B
+      case 'survey_a':
+        setCurrentPhase('video_b');
         break;
-      case TEST_PHASES.VIDEO_B:
-        setCurrentPhase(TEST_PHASES.SURVEY_B); // 修改：進入問卷B
+      case 'video_b':
+        setCurrentPhase('survey_b');
         break;
-      case TEST_PHASES.SURVEY_B:
-        setCurrentPhase(TEST_PHASES.COMPLETED); // 修改：完成測試
+      case 'survey_b':
+        setCurrentPhase('completed');
         break;
       default:
-        setCurrentPhase(TEST_PHASES.START);
+        setCurrentPhase('start');
     }
   };
 

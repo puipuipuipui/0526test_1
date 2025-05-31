@@ -1,4 +1,6 @@
-// 測試階段類型定義
+// frontend/src/types/testTypes.ts - 修正版本
+
+// 測試階段類型定義 - 確保包含所有階段
 export type TestPhase = 
   | 'start'
   | 'intro'
@@ -8,10 +10,10 @@ export type TestPhase =
   | 'reversed_practice'
   | 'combined_test_2'
   | 'results'
-  | 'video_a'      // 新增：影片A
-  | 'survey_a'     // 新增：問卷A
-  | 'video_b'      // 新增：影片B
-  | 'survey_b'     // 新增：問卷B
+  | 'video_a'      
+  | 'survey_a'     
+  | 'video_b'      
+  | 'survey_b'     
   | 'completed';
 
 // 詞彙類型定義
@@ -30,3 +32,12 @@ export interface TestResults {
   femaleComputer: number[];
   maleSkincare: number[];
 }
+
+// 階段指引類型定義 - 新增這個接口
+export interface PhaseInstruction {
+  title: string;
+  content: string;
+}
+
+// 確保 phaseInstructions 的類型是正確的
+export type PhaseInstructionsType = Record<TestPhase, PhaseInstruction>;

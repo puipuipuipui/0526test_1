@@ -1,12 +1,14 @@
+// 修改 CategoryLabels.tsx - 讓分類標籤可以點擊
 import React from 'react';
 import { TestPhase } from '../types/testTypes';
 import { TEST_PHASES } from '../constants/testConstants';
 
 interface CategoryLabelsProps {
   currentPhase: TestPhase;
+  onCategoryClick?: (side: 'left' | 'right') => void; // 新增點擊處理函數
 }
 
-function CategoryLabels({ currentPhase }: CategoryLabelsProps) {
+function CategoryLabels({ currentPhase, onCategoryClick }: CategoryLabelsProps) {
   // 獲取當前階段的標籤
   const getCategoryLabels = (): { leftLabels: string[], rightLabels: string[] } => {
     let leftLabels: string[] = [];
@@ -49,10 +51,20 @@ function CategoryLabels({ currentPhase }: CategoryLabelsProps) {
 
   return (
     <div className="categories-container">
-      {/* Left Column */}
-      <div className="category-column">
+      {/* Left Column - 可點擊 */}
+      <div 
+        className="category-column clickable-category" 
+        onClick={() => onCategoryClick?.('left')}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            onCategoryClick?.('left');
+          }
+        }}
+      >
         <div className="key-hint">
-          <div className="key-hint-text">按 E 鍵</div>
+          <div className="key-hint-text">按 E 鍵 或 點擊此處</div>
         </div>
         <div className="categories-list">
           {leftLabels.map((label, index) => (
@@ -63,10 +75,20 @@ function CategoryLabels({ currentPhase }: CategoryLabelsProps) {
         </div>
       </div>
 
-      {/* Right Column */}
-      <div className="category-column">
+      {/* Right Column - 可點擊 */}
+      <div 
+        className="category-column clickable-category" 
+        onClick={() => onCategoryClick?.('right')}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            onCategoryClick?.('right');
+          }
+        }}
+      >
         <div className="key-hint">
-          <div className="key-hint-text">按 I 鍵</div>
+          <div className="key-hint-text">按 I 鍵 或 點擊此處</div>
         </div>
         <div className="categories-list">
           {rightLabels.map((label, index) => (

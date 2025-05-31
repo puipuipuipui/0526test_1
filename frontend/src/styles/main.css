@@ -416,3 +416,128 @@ body {
   line-height: 1.6;
 }
 
+/* 在 main.css 中新增以下樣式 */
+
+/* 可點擊的分類區域樣式 */
+.clickable-category {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  padding: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.clickable-category:hover {
+  background-color: rgba(24, 144, 255, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(24, 144, 255, 0.15);
+}
+
+.clickable-category:active {
+  transform: translateY(0);
+  background-color: rgba(24, 144, 255, 0.1);
+}
+
+/* 點擊波紋效果 */
+.clickable-category::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(24, 144, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.clickable-category:active::before {
+  width: 200px;
+  height: 200px;
+}
+
+/* 手機版優化 */
+@media (max-width: 768px) {
+  .categories-container {
+    gap: 48px; /* 減少間距以適應手機螢幕 */
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 0 16px;
+  }
+  
+  .clickable-category {
+    min-height: 120px; /* 增加最小高度，方便點擊 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 16px 12px;
+    border: 2px dashed transparent;
+    transition: all 0.3s ease;
+  }
+  
+  .clickable-category:hover,
+  .clickable-category:active {
+    border: 2px dashed var(--primary-color);
+    background-color: rgba(24, 144, 255, 0.08);
+  }
+  
+  .key-hint-text {
+    font-size: 0.75rem; /* 縮小提示文字 */
+    white-space: nowrap;
+  }
+  
+  .category-label {
+    padding: 10px 24px; /* 增加內邊距，方便點擊 */
+    margin: 4px 0;
+  }
+  
+  .category-text {
+    font-size: 1rem; /* 確保文字大小適中 */
+  }
+}
+
+/* 超小螢幕優化 */
+@media (max-width: 480px) {
+  .categories-container {
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+  
+  .clickable-category {
+    min-height: 100px;
+    padding: 12px 8px;
+  }
+  
+  .key-hint-text {
+    font-size: 0.7rem;
+  }
+  
+  .category-label {
+    padding: 8px 16px;
+  }
+  
+  .category-text {
+    font-size: 0.9rem;
+  }
+}
+
+/* 新增測試區域指引 */
+.mobile-instructions {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-instructions {
+    display: block;
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    background-color: rgba(24, 144, 255, 0.1);
+    border-radius: 8px;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+}

@@ -1,3 +1,5 @@
+// frontend/src/components/Instructions.tsx - 修正版本
+
 import React from 'react';
 import { Modal, Typography, Button } from 'antd';
 import { TestPhase } from '../types/testTypes';
@@ -16,7 +18,10 @@ function Instructions({
   visible, 
   onStart 
 }: InstructionsProps) {
-  const { title, content } = phaseInstructions[currentPhase];
+  // 安全地獲取指引內容，提供預設值
+  const instruction = phaseInstructions[currentPhase];
+  const title = instruction?.title || '';
+  const content = instruction?.content || '';
   
   // 如果沒有指引內容，則不渲染
   if (!title || !content) {
@@ -35,7 +40,7 @@ function Instructions({
       cancelButtonProps={{ style: { display: 'none' } }}
       centered
     >
-      {/* 這裡使用 white-space: pre-line 來保留換行 */}
+      {/* 使用 white-space: pre-line 來保留換行 */}
       <Paragraph 
         className="text-base"
         style={{ 
@@ -48,6 +53,6 @@ function Instructions({
       </Paragraph>
     </Modal>
   );
-};
+}
 
 export default Instructions;

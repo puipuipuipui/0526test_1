@@ -1,3 +1,4 @@
+// 修改 TestPage.tsx 中的相關部分
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Instructions from '../components/Instructions';
@@ -39,11 +40,11 @@ function TestPage() {
     startNewTest
   } = useTestLogic({ 
     maxTestCounts: {
-      gender_practice: 10,      // 第一階段：性別練習 - 10次
-      product_practice: 10,     // 第二階段：產品練習 - 10次 
-      combined_test_1: 20,      // 第三階段：組合測試1 - 20次
-      reversed_practice: 10,    // 第四階段：反向練習 - 10次
-      combined_test_2: 20       // 第五階段：組合測試2 - 20次
+      gender_practice: 10,      
+      product_practice: 10,     
+      combined_test_1: 20,      
+      reversed_practice: 10,    
+      combined_test_2: 20       
     }
   });
 
@@ -69,6 +70,13 @@ function TestPage() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentPhase, showInstructions, checkAnswer]);
+
+  // 處理點擊答題 - 新增
+  const handleAnswer = (side: 'left' | 'right') => {
+    if (!showInstructions) {
+      checkAnswer(side);
+    }
+  };
 
   // 重新開始測試的處理函數
   const handleRestart = () => {
@@ -104,6 +112,7 @@ function TestPage() {
                 maxTestCount={maxTestCount}
                 showInstructions={showInstructions}
                 onStartTest={startTest}
+                onAnswer={handleAnswer} // 新增答題處理
               />
             )}
           </div>
@@ -124,7 +133,7 @@ function TestPage() {
             onContinue={moveToNextPhase}
           />
         );
-      case TEST_PHASES.VIDEO_A: // 新增：影片A
+      case TEST_PHASES.VIDEO_A:
         return (
           <VideoPage 
             onContinue={moveToNextPhase} 
@@ -132,7 +141,7 @@ function TestPage() {
             biasResultSuffix={getBiasResultSuffix()}
           />
         );
-      case TEST_PHASES.SURVEY_A: // 新增：問卷A
+      case TEST_PHASES.SURVEY_A:
         return (
           <SurveyPage 
             onComplete={moveToNextPhase}
@@ -140,7 +149,7 @@ function TestPage() {
             biasResultSuffix={getBiasResultSuffix()}
           />
         );
-      case TEST_PHASES.VIDEO_B: // 新增：影片B
+      case TEST_PHASES.VIDEO_B:
         return (
           <VideoPage 
             onContinue={moveToNextPhase} 
@@ -148,7 +157,7 @@ function TestPage() {
             biasResultSuffix={getBiasResultSuffix()}
           />
         );
-      case TEST_PHASES.SURVEY_B: // 新增：問卷B
+      case TEST_PHASES.SURVEY_B:
         return (
           <SurveyPage 
             onComplete={moveToNextPhase}
