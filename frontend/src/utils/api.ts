@@ -18,6 +18,15 @@ const API_BASE_URL = process.env.NODE_ENV === 'production'
   ? 'https://0526test1-production.up.railway.app/api'  // 替換為你的 Railway 後端 URL
   : 'http://localhost:5000/api';
 
+// 新增：獲取當前日期（只有日期部分）
+function getCurrentDateOnly(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 export async function saveTestResults(data: TestResultData): Promise<any> {
   try {
     // 產生或獲取用戶 ID
@@ -39,7 +48,7 @@ export async function saveTestResults(data: TestResultData): Promise<any> {
     // 準備資料
     const payload = {
       userId: userId,
-      testDate: new Date().toISOString(),
+      testDate: getCurrentDateOnly(), // 修改：只儲存日期
       results: {
         maleComputer: data.testResults.maleComputer,
         femaleSkincare: data.testResults.femaleSkincare,
@@ -59,7 +68,7 @@ export async function saveTestResults(data: TestResultData): Promise<any> {
       deviceInfo: deviceInfo
     };
     
-    console.log('🚀 正在儲存測試結果到後端 API...', { userId });
+    console.log('🚀 正在儲存測試結果到後端 API...', { userId, testDate: payload.testDate });
     
     // 添加重試機制
     let retryCount = 0;
@@ -92,7 +101,7 @@ export async function saveTestResults(data: TestResultData): Promise<any> {
           console.log('💾 嘗試本地儲存作為備份...');
           const backupData = {
             ...payload,
-            savedAt: new Date().toISOString(),
+            savedAt: getCurrentDateOnly(), // 備份也只記錄日期
             isBackup: true
           };
           localStorage.setItem(`backup_test_result_${userId}`, JSON.stringify(backupData));
