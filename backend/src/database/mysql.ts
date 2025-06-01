@@ -66,21 +66,41 @@ const createConnectionConfig = () => {
 
 const pool = mysql.createPool(createConnectionConfig());
 
-// backend/src/database/mysql.ts
+// 格式化日期為 YYYY-MM-DD 格式
+function formatDateOnly(dateInput: string | Date): string {
+  const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 export async function testConnection(): Promise<boolean> {
-    try {
-      console.log('🔍 測試 MySQL 連接...');
-      console.log('🔧 使用連接方式:', process.env.MYSQL_URL ? 'MYSQL_URL (已解析)' : '個別變數');
-      
-      // 修正 SQL 語法錯誤
-      const [rows] = await pool.execute('SELECT 1 as test, NOW() as timestamp');
-      console.log('✅ MySQL 連接成功:', rows);
-      return true;
-    } catch (error) {
-      console.error('❌ MySQL 連接失敗:', error);
-      return false;
-    }
+  try {
+    console.log('🔍 測試 MySQL 連接...');
+    console.log('🔧 使用連接方式:', process.env.MYSQL_URL ? 'MYSQL_URL (已解析)' : '個別變數');
+    
+    const [rows] = await pool.execute('SELECT 1 as test, NOW() as timestamp');
+    console.log('✅ MySQL 連接成功:', rows);
+    return true;
+  } catch (error) {
+    console.error('❌ MySQL 連接失敗:', error);
+    return false;
   }
+}
+
+// 生成下一個可用的 ID
+async function getNextId(): Promise<number> {
+  try {
+    const [rows] = await pool.execute('SELECT MAX(id) as maxId FROM test_results');
+    const maxId = (rows as any[])[0]?.maxId || 0;
+    return maxId + 1;
+  } catch (error) {
+    console.error('❌ 獲取最大 ID 失敗:', error);
+    // 如果查詢失敗，使用時間戳作為備用方案
+    return Math.floor(Date.now() / 1000); // 使用秒級時間戳
+  }
+}
 
 export async function saveTestResult(data: any): Promise<MysqlInsertResult> {
   try {
@@ -91,21 +111,39 @@ export async function saveTestResult(data: any): Promise<MysqlInsertResult> {
       throw new Error('資料庫連接失敗');
     }
     
+    // 處理日期：只保留日期部分
+    const testDate = data.testDate ? formatDateOnly(data.testDate) : formatDateOnly(new Date());
+    
+    // 生成新的 ID
+    const newId = await getNextId();
+    
+    console.log('🆔 生成新 ID:', newId);
+    console.log('📅 格式化日期:', { 
+      原始日期: data.testDate, 
+      格式化後: testDate 
+    });
+    
     const [result] = await pool.execute(`
       INSERT INTO test_results 
-      (user_id, test_date, results, analysis, survey_responses, device_info) 
-      VALUES (?, ?, ?, ?, ?, ?)
+      (id, user_id, test_date, results, analysis, survey_responses, device_info) 
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `, [
+      newId,
       data.userId,
-      data.testDate,
+      testDate,
       JSON.stringify(data.results),
       JSON.stringify(data.analysis),
       JSON.stringify(data.surveyResponses || {}),
       JSON.stringify(data.deviceInfo || {})
     ]);
     
-    console.log('✅ 資料插入成功, ID:', (result as any).insertId);
-    return result as MysqlInsertResult;
+    console.log('✅ 資料插入成功, 使用 ID:', newId);
+    
+    // 返回我們手動設定的 ID
+    return {
+      insertId: newId,
+      affectedRows: (result as any).affectedRows
+    } as MysqlInsertResult;
     
   } catch (error) {
     console.error('❌ saveTestResult 錯誤:', error);
