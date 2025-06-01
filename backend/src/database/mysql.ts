@@ -66,19 +66,21 @@ const createConnectionConfig = () => {
 
 const pool = mysql.createPool(createConnectionConfig());
 
+// backend/src/database/mysql.ts
 export async function testConnection(): Promise<boolean> {
-  try {
-    console.log('🔍 測試 MySQL 連接...');
-    console.log('🔧 使用連接方式:', process.env.MYSQL_URL ? 'MYSQL_URL (已解析)' : '個別變數');
-    
-    const [rows] = await pool.execute('SELECT 1 as test, NOW() as current_timestamp');
-    console.log('✅ MySQL 連接成功:', rows);
-    return true;
-  } catch (error) {
-    console.error('❌ MySQL 連接失敗:', error);
-    return false;
+    try {
+      console.log('🔍 測試 MySQL 連接...');
+      console.log('🔧 使用連接方式:', process.env.MYSQL_URL ? 'MYSQL_URL (已解析)' : '個別變數');
+      
+      // 修正 SQL 語法錯誤
+      const [rows] = await pool.execute('SELECT 1 as test, NOW() as timestamp');
+      console.log('✅ MySQL 連接成功:', rows);
+      return true;
+    } catch (error) {
+      console.error('❌ MySQL 連接失敗:', error);
+      return false;
+    }
   }
-}
 
 export async function saveTestResult(data: any): Promise<MysqlInsertResult> {
   try {
