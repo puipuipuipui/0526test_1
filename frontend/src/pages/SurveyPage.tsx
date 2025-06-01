@@ -123,7 +123,9 @@ function SurveyPage({ onComplete, surveyType, biasResultSuffix }: SurveyPageProp
           marginBottom: '24px',
           background: 'linear-gradient(135deg, #f5f7fa 0%, #eef2f7 100%)'
         }}
-        bodyStyle={{ padding: '32px' }}
+        styles={{
+          body: { padding: '32px' }  // ✅ 添加這個新的 styles 屬性
+        }}
       >
         {/* 問卷內容 */}
         <Space direction="vertical" size="large" style={{ width: '100%' }}>

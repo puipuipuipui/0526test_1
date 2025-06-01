@@ -23,8 +23,8 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // MongoDB 連接
-const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://f113156124:5sxaxnkpcVXdfCbw@huihui0.ps2xz32.mongodb.net/gender-bias-test?retryWrites=true&w=majority&appName=huihui0';
-
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://f113156124:5sxaxnkpcVXdfCbw@huihui0.ps2xz32.mongodb.net/?retryWrites=true&w=majority&appName=huihui0';
+// 'mongodb+srv://f113156124:5sxaxnkpcVXdfCbw@huihui0.ps2xz32.mongodb.net/?retryWrites=true&w=majority&appName=huihui0'
 // 連接 MongoDB 並處理連接事件
 const connectDB = async () => {
   try {
