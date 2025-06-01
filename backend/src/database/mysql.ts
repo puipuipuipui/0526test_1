@@ -1,4 +1,4 @@
-// backend/src/database/mysql.ts
+// backend/src/database/mysql.ts - 改良版本
 import mysql from 'mysql2/promise';
 import { URL } from 'url';
 
@@ -89,65 +89,87 @@ export async function testConnection(): Promise<boolean> {
   }
 }
 
-// 生成下一個可用的 ID
-async function getNextId(): Promise<number> {
-  try {
-    const [rows] = await pool.execute('SELECT MAX(id) as maxId FROM test_results');
-    const maxId = (rows as any[])[0]?.maxId || 0;
-    return maxId + 1;
-  } catch (error) {
-    console.error('❌ 獲取最大 ID 失敗:', error);
-    // 如果查詢失敗，使用時間戳作為備用方案
-    return Math.floor(Date.now() / 1000); // 使用秒級時間戳
-  }
+// 改良的 ID 生成機制 - 使用時間戳避免併發問題
+function generateUniqueId(): number {
+  // 使用時間戳 + 隨機數確保唯一性
+  const timestamp = Date.now();
+  const random = Math.floor(Math.random() * 1000);
+  // 組合成一個較大的數字，但確保不會溢出
+  return parseInt(`${timestamp.toString().slice(-8)}${random.toString().padStart(3, '0')}`);
 }
 
 export async function saveTestResult(data: any): Promise<MysqlInsertResult> {
+  const connection = await pool.getConnection();
+  
   try {
     console.log('💾 準備儲存測試結果...');
-    
-    const connected = await testConnection();
-    if (!connected) {
-      throw new Error('資料庫連接失敗');
-    }
     
     // 處理日期：只保留日期部分
     const testDate = data.testDate ? formatDateOnly(data.testDate) : formatDateOnly(new Date());
     
-    // 生成新的 ID
-    const newId = await getNextId();
+    // 使用改良的 ID 生成機制
+    let newId = generateUniqueId();
+    let retryCount = 0;
+    const maxRetries = 3;
     
-    console.log('🆔 生成新 ID:', newId);
-    console.log('📅 格式化日期:', { 
-      原始日期: data.testDate, 
-      格式化後: testDate 
-    });
+    while (retryCount < maxRetries) {
+      try {
+        console.log(`🆔 嘗試使用 ID: ${newId} (第 ${retryCount + 1} 次)`);
+        console.log('📅 格式化日期:', { 
+          原始日期: data.testDate, 
+          格式化後: testDate 
+        });
+        
+        const [result] = await connection.execute(`
+          INSERT INTO test_results 
+          (id, user_id, test_date, results, analysis, survey_responses, device_info) 
+          VALUES (?, ?, ?, ?, ?, ?, ?)
+        `, [
+          newId,
+          data.userId,
+          testDate,
+          JSON.stringify(data.results),
+          JSON.stringify(data.analysis),
+          JSON.stringify(data.surveyResponses || {}),
+          JSON.stringify(data.deviceInfo || {})
+        ]);
+        
+        console.log('✅ 資料插入成功, 使用 ID:', newId);
+        
+        return {
+          insertId: newId,
+          affectedRows: (result as any).affectedRows
+        } as MysqlInsertResult;
+        
+      } catch (insertError: any) {
+        if (insertError.code === 'ER_DUP_ENTRY') {
+          // ID 重複，生成新的 ID 重試
+          console.log(`⚠️ ID ${newId} 已存在，重新生成...`);
+          newId = generateUniqueId();
+          retryCount++;
+          
+          if (retryCount >= maxRetries) {
+            throw new Error(`無法生成唯一 ID，已重試 ${maxRetries} 次`);
+          }
+          
+          // 短暫延遲後重試
+          await new Promise(resolve => setTimeout(resolve, 100));
+          continue;
+        } else {
+          // 其他錯誤直接拋出
+          throw insertError;
+        }
+      }
+    }
     
-    const [result] = await pool.execute(`
-      INSERT INTO test_results 
-      (id, user_id, test_date, results, analysis, survey_responses, device_info) 
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `, [
-      newId,
-      data.userId,
-      testDate,
-      JSON.stringify(data.results),
-      JSON.stringify(data.analysis),
-      JSON.stringify(data.surveyResponses || {}),
-      JSON.stringify(data.deviceInfo || {})
-    ]);
-    
-    console.log('✅ 資料插入成功, 使用 ID:', newId);
-    
-    // 返回我們手動設定的 ID
-    return {
-      insertId: newId,
-      affectedRows: (result as any).affectedRows
-    } as MysqlInsertResult;
+    throw new Error('未知錯誤：迴圈異常結束');
     
   } catch (error) {
     console.error('❌ saveTestResult 錯誤:', error);
     throw error;
+  } finally {
+    // 確保釋放連接
+    connection.release();
   }
 }
 
