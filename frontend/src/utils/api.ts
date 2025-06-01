@@ -15,7 +15,7 @@ interface TestResultData {
 
 // 後端 API 基礎 URL
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://0526test1-production.up.railway.app/'  // 替換為你的 Railway 後端 URL
+  ? 'https://0526test1-production.up.railway.app'  // 替換為你的 Railway 後端 URL
   : 'http://localhost:5000/api';
 
 export async function saveTestResults(data: TestResultData): Promise<any> {
