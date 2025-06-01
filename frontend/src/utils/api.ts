@@ -1,17 +1,6 @@
-// frontend/src/utils/api.ts
+import { supabase } from './supabase';
 import { TestResults } from '../types/testTypes';
 
-// API 基礎 URL 配置
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://0526test1-production.up.railway.app/api'  // 稍後替換成 Railway 提供的網址
-  : 'http://localhost:5000/api';  // 開發環境使用本地後端
-
-// // API 基礎 URL 配置
-// const API_BASE_URL = process.env.NODE_ENV === 'production' 
-//   ? '/api'  // 生產環境使用相對路徑
-//   : 'http://localhost:5000/api';  // 開發環境使用完整 URL
-
-// 定義測試結果資料介面
 interface TestResultData {
   testResults: TestResults;
   dScore: number;
@@ -22,14 +11,8 @@ interface TestResultData {
   d2Score?: number;
   d3Score?: number;
   d4Score?: number;
-  surveyResponses?: Record<string, any>;
 }
 
-/**
- * 儲存測試結果到後端
- * @param data 測試結果資料
- * @returns Promise<any>
- */
 export async function saveTestResults(data: TestResultData): Promise<any> {
   try {
     // 產生或獲取用戶 ID
@@ -48,10 +31,10 @@ export async function saveTestResults(data: TestResultData): Promise<any> {
       platform: navigator.platform
     };
     
-    // 準備要發送的資料
+    // 準備資料
     const payload = {
-      userId,
-      testDate: new Date().toISOString(),
+      user_id: userId,
+      test_date: new Date().toISOString(),
       results: {
         maleComputer: data.testResults.maleComputer,
         femaleSkincare: data.testResults.femaleSkincare,
@@ -68,72 +51,47 @@ export async function saveTestResults(data: TestResultData): Promise<any> {
         d3Score: data.d3Score,
         d4Score: data.d4Score
       },
-      surveyResponses: data.surveyResponses || {},
-      deviceInfo
+      device_info: deviceInfo
     };
     
-    console.log('🚀 正在儲存測試結果...', { userId, apiUrl: `${API_BASE_URL}/test-results` });
+    console.log('🚀 正在儲存測試結果到 Supabase...', { userId });
     
-    const response = await fetch(`${API_BASE_URL}/test-results`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(payload),
-    });
+    // 插入資料到 Supabase
+    const { data: result, error } = await supabase
+      .from('test_results')
+      .insert([payload])
+      .select();
     
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('❌ API 回應錯誤:', {
-        status: response.status,
-        statusText: response.statusText,
-        errorText
-      });
-      throw new Error(`伺服器錯誤 (${response.status}): ${response.statusText}`);
+    if (error) {
+      console.error('❌ Supabase 錯誤:', error);
+      throw new Error(`儲存失敗: ${error.message}`);
     }
     
-    const result = await response.json();
     console.log('✅ 測試結果儲存成功:', result);
-    return result;
+    return { success: true, data: result };
     
   } catch (error) {
     console.error('❌ 儲存測試結果失敗:', error);
-    
-    // 根據錯誤類型提供更詳細的錯誤訊息
-    if (error instanceof TypeError && error.message.includes('fetch')) {
-      throw new Error('無法連接到伺服器，請檢查網路連接或稍後再試');
-    } else if (error instanceof Error) {
-      throw new Error(`儲存失敗: ${error.message}`);
-    } else {
-      throw new Error('未知錯誤，請稍後再試');
-    }
+    throw error;
   }
 }
 
-/**
- * 檢查 API 連接狀態
- * @returns Promise<boolean>
- */
+// 檢查 Supabase 連線狀態
 export async function checkApiHealth(): Promise<boolean> {
   try {
-    const response = await fetch(`${API_BASE_URL}/health`, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json'
-      }
-    });
+    const { data, error } = await supabase
+      .from('test_results')
+      .select('count', { count: 'exact', head: true });
     
-    if (response.ok) {
-      const result = await response.json();
-      console.log('✅ API 健康檢查通過:', result);
-      return true;
-    } else {
-      console.warn('⚠️  API 健康檢查失敗:', response.status);
+    if (error) {
+      console.error('❌ Supabase 連線檢查失敗:', error);
       return false;
     }
+    
+    console.log('✅ Supabase 連線正常');
+    return true;
   } catch (error) {
-    console.error('❌ API 健康檢查錯誤:', error);
+    console.error('❌ Supabase 連線錯誤:', error);
     return false;
   }
 }
