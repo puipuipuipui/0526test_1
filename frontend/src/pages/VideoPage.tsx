@@ -27,13 +27,13 @@ function VideoPage({ onContinue, videoType, biasResultSuffix }: VideoPageProps) 
   // 監聽影片開始播放，啟動倒數計時
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    
+
     if (videoStarted && countdown > 0) {
       timer = setTimeout(() => {
         setCountdown(prev => prev - 1);
       }, 1000);
     }
-    
+
     return () => {
       if (timer) clearTimeout(timer);
     };
@@ -44,33 +44,33 @@ function VideoPage({ onContinue, videoType, biasResultSuffix }: VideoPageProps) 
     // 判斷是女性與電腦類偏見還是男性與護膚類偏見
     const isFemaleComputerBias = biasResultSuffix === '_girl';
     const isMaleSkinceBias = biasResultSuffix === '_boy';
-    
+
     if (isFemaleComputerBias) {
       // 測驗結果為「女性與電腦類」偏見
       if (videoType === 'A') {
         // 影片A：女性與電腦類產品
-        return 'https://youtu.be/UeFxb25vCq8';
+        return 'https://www.youtube.com/embed/UeFxb25vCq8?rel=0&modestbranding=1';
       } else {
         // 影片B：男性與電腦類產品
-        return 'https://youtu.be/wNQcKlysvwE';
+        return 'https://www.youtube.com/embed/wNQcKlysvwE?rel=0&modestbranding=1';
       }
     } else if (isMaleSkinceBias) {
       // 測驗結果為「男性與護膚類」偏見
       if (videoType === 'A') {
         // 影片A：男性與護膚類產品
-        return 'https://youtu.be/fans7Uk4A2E';
+        return 'https://www.youtube.com/embed/fans7Uk4A2E?rel=0&modestbranding=1';
       } else {
         // 影片B：女性與護膚類產品
-        return 'https://youtu.be/9Q5aFOGdR5Q';
+        return 'https://www.youtube.com/embed/9Q5aFOGdR5Q?rel=0&modestbranding=1';
       }
     } else {
       // 測驗結果為「沒有明顯的性別商品偏見」- 使用預設邏輯（女性與電腦類）
       if (videoType === 'A') {
         // 影片A：女性與電腦類產品
-        return 'https://youtu.be/UeFxb25vCq8';
+        return 'https://www.youtube.com/embed/UeFxb25vCq8?rel=0&modestbranding=1';
       } else {
         // 影片B：男性與電腦類產品
-        return 'https://youtu.be/wNQcKlysvwE';
+        return 'https://www.youtube.com/embed/wNQcKlysvwE?rel=0&modestbranding=1';
       }
     }
   };
@@ -79,7 +79,7 @@ function VideoPage({ onContinue, videoType, biasResultSuffix }: VideoPageProps) 
   const getVideoTitle = (): string => {
     const isFemaleComputerBias = biasResultSuffix === '_girl';
     const isMaleSkinceBias = biasResultSuffix === '_boy';
-    
+
     if (isFemaleComputerBias) {
       if (videoType === 'A') {
         return '第一部聊天機器人互動影片（女性與電腦產品）';
