@@ -49,28 +49,28 @@ function VideoPage({ onContinue, videoType, biasResultSuffix }: VideoPageProps) 
       // 測驗結果為「女性與電腦類」偏見
       if (videoType === 'A') {
         // 影片A：女性與電腦類產品
-        return 'https://www.youtube.com/embed/UeFxb25vCq8?rel=0&modestbranding=1';
+        return 'https://www.youtube.com/embed/UeFxb25vCq8?modestbranding=1';
       } else {
         // 影片B：男性與電腦類產品
-        return 'https://www.youtube.com/embed/wNQcKlysvwE?rel=0&modestbranding=1';
+        return 'https://www.youtube.com/embed/wNQcKlysvwE?modestbranding=1';
       }
     } else if (isMaleSkinceBias) {
       // 測驗結果為「男性與護膚類」偏見
       if (videoType === 'A') {
         // 影片A：男性與護膚類產品
-        return 'https://www.youtube.com/embed/fans7Uk4A2E?rel=0&modestbranding=1';
+        return 'https://www.youtube.com/embed/fans7Uk4A2E?modestbranding=1';
       } else {
         // 影片B：女性與護膚類產品
-        return 'https://www.youtube.com/embed/9Q5aFOGdR5Q?rel=0&modestbranding=1';
+        return 'https://www.youtube.com/embed/9Q5aFOGdR5Q?modestbranding=1';
       }
     } else {
       // 測驗結果為「沒有明顯的性別商品偏見」- 使用預設邏輯（女性與電腦類）
       if (videoType === 'A') {
         // 影片A：女性與電腦類產品
-        return 'https://www.youtube.com/embed/UeFxb25vCq8?rel=0&modestbranding=1';
+        return 'https://www.youtube.com/embed/UeFxb25vCq8?modestbranding=1';
       } else {
         // 影片B：男性與電腦類產品
-        return 'https://www.youtube.com/embed/wNQcKlysvwE?rel=0&modestbranding=1';
+        return 'https://www.youtube.com/embed/wNQcKlysvwE?modestbranding=1';
       }
     }
   };
