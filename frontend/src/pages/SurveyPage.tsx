@@ -83,12 +83,12 @@ function SurveyPage({ onComplete, surveyType, biasResultSuffix, d1Score = 0, d2S
         // 測驗結果為「女性與電腦類」偏見
         if (surveyType === 'A') {
           // 影片A：女性與電腦類產品 -> 女+電競滑鼠問卷
-          googleFormUrl = 'https://forms.gle/wS5B1SFpsABLDQZr6';
+          googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSe2wqmYqVSXptUJoKmFHJHw1aJMS5AcMy7UpKCkvd8_Qd_tgw/viewform?usp=pp_url&entry.1526772147=';
           userIdSuffix = `${userId}_girl_A`;
           surveyDescription = '女性與電競滑鼠問卷';
         } else {
           // 影片B：男性與電腦類產品 -> 男+電競滑鼠問卷
-          googleFormUrl = 'https://forms.gle/vhNbMNrbrT7VaWqCA';
+          googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSf9N2zED6tC7VxWTI-Be9s2H0Q11KgtH5iG9BBFLyAU0n-LtQ/viewform?usp=pp_url&entry.1526772147=';
           userIdSuffix = `${userId}_girl_B`;
           surveyDescription = '男性與電競滑鼠問卷';
         }
@@ -96,12 +96,12 @@ function SurveyPage({ onComplete, surveyType, biasResultSuffix, d1Score = 0, d2S
         // 測驗結果為「男性與護膚類」偏見
         if (surveyType === 'A') {
           // 影片A：男性與護膚類產品 -> 男+面膜問卷
-          googleFormUrl = 'https://forms.gle/ktajQyuToUknD7Li8';
+          googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSeYnpJafO855tuK7QwWGkv3fXuB2L6gmBwlLNh77EilcA05iQ/viewform?usp=pp_url&entry.1526772147=';
           userIdSuffix = `${userId}_boy_A`;
           surveyDescription = '男性與面膜問卷';
         } else {
           // 影片B：女性與護膚類產品 -> 女+面膜問卷
-          googleFormUrl = 'https://forms.gle/GQuHugyctxLZ7mcW8';
+          googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSdtUx2JZZpi4ABiyKvVmeLzZz1-i64-jr2U1K2NIXsixbrc6A/viewform?usp=pp_url&entry.1526772147=';
           userIdSuffix = `${userId}_boy_B`;
           surveyDescription = '女性與面膜問卷';
         }
@@ -111,12 +111,12 @@ function SurveyPage({ onComplete, surveyType, biasResultSuffix, d1Score = 0, d2S
           // 使用電腦類問卷
           if (surveyType === 'A') {
             // 影片A：女性與電腦類產品 -> 女+電競滑鼠問卷
-            googleFormUrl = 'https://forms.gle/wS5B1SFpsABLDQZr6';
+            googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSe2wqmYqVSXptUJoKmFHJHw1aJMS5AcMy7UpKCkvd8_Qd_tgw/viewform?usp=pp_url&entry.1526772147=';
             userIdSuffix = `${userId}_none_A`;
             surveyDescription = '女性與電競滑鼠問卷（基於D值分析）';
           } else {
             // 影片B：男性與電腦類產品 -> 男+電競滑鼠問卷
-            googleFormUrl = 'https://forms.gle/vhNbMNrbrT7VaWqCA';
+            googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSf9N2zED6tC7VxWTI-Be9s2H0Q11KgtH5iG9BBFLyAU0n-LtQ/viewform?usp=pp_url&entry.1526772147=';
             userIdSuffix = `${userId}_none_B`;
             surveyDescription = '男性與電競滑鼠問卷（基於D值分析）';
           }
@@ -124,12 +124,12 @@ function SurveyPage({ onComplete, surveyType, biasResultSuffix, d1Score = 0, d2S
           // 使用護膚類問卷
           if (surveyType === 'A') {
             // 影片A：男性與護膚類產品 -> 男+面膜問卷
-            googleFormUrl = 'https://forms.gle/ktajQyuToUknD7Li8';
+            googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSeYnpJafO855tuK7QwWGkv3fXuB2L6gmBwlLNh77EilcA05iQ/viewform?usp=pp_url&entry.1526772147=';
             userIdSuffix = `${userId}_none_A`;
             surveyDescription = '男性與面膜問卷（基於D值分析）';
           } else {
             // 影片B：女性與護膚類產品 -> 女+面膜問卷
-            googleFormUrl = 'https://forms.gle/GQuHugyctxLZ7mcW8';
+            googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSdtUx2JZZpi4ABiyKvVmeLzZz1-i64-jr2U1K2NIXsixbrc6A/viewform?usp=pp_url&entry.1526772147=';
             userIdSuffix = `${userId}_none_B`;
             surveyDescription = '女性與面膜問卷（基於D值分析）';
           }
@@ -148,7 +148,7 @@ function SurveyPage({ onComplete, surveyType, biasResultSuffix, d1Score = 0, d2S
     } else {
       console.warn('⚠️  找不到用戶 ID，可能會影響資料匹配');
       // 如果沒有 user ID，使用預設問卷（女+電競滑鼠）
-      setSurveyUrl('https://forms.gle/wS5B1SFpsABLDQZr6');
+      setSurveyUrl('https://docs.google.com/forms/d/e/1FAIpQLSe2wqmYqVSXptUJoKmFHJHw1aJMS5AcMy7UpKCkvd8_Qd_tgw/viewform?usp=pp_url&entry.1526772147=');
     }
   }, [surveyType, biasResultSuffix, d1Score, d2Score, d3Score, d4Score, biasLevel]);
 
