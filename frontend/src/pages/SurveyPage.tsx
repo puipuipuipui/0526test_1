@@ -136,7 +136,9 @@ function SurveyPage({ onComplete, surveyType, biasResultSuffix, d1Score = 0, d2S
         }
       }
       
-      setSurveyUrl(googleFormUrl);
+      // 組合完整的問卷URL（加上用戶ID）
+      const completeUrl = `${googleFormUrl}${userIdSuffix}`;
+      setSurveyUrl(completeUrl);
       
       console.log(`🔗 第${surveyType === 'A' ? '一' : '二'}份問卷連結已準備完成:`, userIdSuffix);
       console.log(`📋 第${surveyType === 'A' ? '一' : '二'}份問卷類型:`, surveyDescription);
@@ -148,7 +150,7 @@ function SurveyPage({ onComplete, surveyType, biasResultSuffix, d1Score = 0, d2S
     } else {
       console.warn('⚠️  找不到用戶 ID，可能會影響資料匹配');
       // 如果沒有 user ID，使用預設問卷（女+電競滑鼠）
-      setSurveyUrl('https://docs.google.com/forms/d/e/1FAIpQLSe2wqmYqVSXptUJoKmFHJHw1aJMS5AcMy7UpKCkvd8_Qd_tgw/viewform?usp=pp_url&entry.1526772147=');
+      setSurveyUrl('https://docs.google.com/forms/d/e/1FAIpQLSe2wqmYqVSXptUJoKmFHJHw1aJMS5AcMy7UpKCkvd8_Qd_tgw/viewform?usp=pp_url&entry.1526772147=default_user');
     }
   }, [surveyType, biasResultSuffix, d1Score, d2Score, d3Score, d4Score, biasLevel]);
 
