@@ -148,7 +148,7 @@ function SurveyPage({ onComplete, surveyType, biasResultSuffix }: SurveyPageProp
             
             <div>
               <Title level={4} style={{ marginTop: 0, marginBottom: '16px' }}>
-                您的寶貴反饋
+                您的寶貴回饋
               </Title>
               <Paragraph style={{ 
                 fontSize: '1.125rem', 

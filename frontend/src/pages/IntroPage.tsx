@@ -75,12 +75,12 @@ function IntroPage({ onStart }: IntroPageProps) {
         
         <Title level={4} style={{ marginTop: '-10px', marginBottom: '-10px' }}>注意：</Title>
         <ul style={{ fontSize: '1.12rem', paddingLeft: '20px' }}>
-          <li style={{ marginBottom: '8px' }}>請把您的食指放在「E鍵和I鍵」上以確保能最快反應。</li>
+          <li style={{ marginBottom: '8px' }}>請把您的食指放在「E鍵和I鍵」上，以確保您能以最快反應進行測驗。</li>
           <li style={{ marginBottom: '8px' }}>上面的標題會告訴您哪一個字應該歸類到哪一個反應鍵。</li>
           <li style={{ marginBottom: '8px' }}>請盡可能快速並正確地分類每一項，太慢的分類會導致資料無效。</li>
           <li style={{ marginBottom: '8px' }}>如果您反應錯誤，會看到提示訊息，請修正答案。</li>
           <li style={{ marginBottom: '8px' }}>系統將會記錄您的反應時間。</li>
-          <li style={{ marginBottom: '8px' }}>為了得到有效的結果，避免在實驗中走神或出神。</li>
+          <li style={{ marginBottom: '8px' }}>為了得到有效的結果，請避免在實驗中走神或出神。</li>
         </ul>
       </CustomCard>
       

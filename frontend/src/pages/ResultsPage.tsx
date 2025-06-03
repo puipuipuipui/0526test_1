@@ -573,10 +573,10 @@ function ResultsPage({
             此圖表顯示了您在不同組合下的平均反應時間（毫秒）。較短的反應時間表示您對這些組合的聯想更為自然，
             而較長的反應時間則可能表示這些組合與您的潛在認知存在衝突。
           </Paragraph>
-          <Paragraph>
+          {/* <Paragraph>
             <Text strong>左側兩個條形：</Text> 傳統性別商品組合（男性+電腦類、女性+護膚類）<br />
             <Text strong>右側兩個條形：</Text> 非傳統性別商品組合（女性+電腦類、男性+護膚類）
-          </Paragraph>
+          </Paragraph> */}
         </CustomCard>
       </div>
 
