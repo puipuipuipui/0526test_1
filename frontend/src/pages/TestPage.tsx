@@ -38,25 +38,25 @@ function TestPage() {
     moveToNextPhase,
     startTest,
     startNewTest
-  } = useTestLogic({ 
+  } = useTestLogic({
     maxTestCounts: {
-      gender_practice: 10,      
-      product_practice: 10,     
-      combined_test_1: 20,      
-      reversed_practice: 10,    
-      combined_test_2: 20       
+      gender_practice: 10,
+      product_practice: 10,
+      combined_test_1: 20,
+      reversed_practice: 10,
+      combined_test_2: 20
     }
   });
 
   // 偵測鍵盤輸入
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (currentPhase === TEST_PHASES.GENDER_PRACTICE || 
-          currentPhase === TEST_PHASES.PRODUCT_PRACTICE || 
-          currentPhase === TEST_PHASES.COMBINED_TEST_1 || 
-          currentPhase === TEST_PHASES.REVERSED_PRACTICE || 
-          currentPhase === TEST_PHASES.COMBINED_TEST_2) {
-        
+      if (currentPhase === TEST_PHASES.GENDER_PRACTICE ||
+        currentPhase === TEST_PHASES.PRODUCT_PRACTICE ||
+        currentPhase === TEST_PHASES.COMBINED_TEST_1 ||
+        currentPhase === TEST_PHASES.REVERSED_PRACTICE ||
+        currentPhase === TEST_PHASES.COMBINED_TEST_2) {
+
         if (!showInstructions) {
           if (e.key === 'e' || e.key === 'E') {
             checkAnswer('left');
@@ -98,13 +98,13 @@ function TestPage() {
         return (
           <div className="test-container">
             {showInstructions ? (
-              <Instructions 
-                currentPhase={currentPhase} 
+              <Instructions
+                currentPhase={currentPhase}
                 visible={showInstructions}
-                onStart={startTest} 
+                onStart={startTest}
               />
             ) : (
-              <TestContent 
+              <TestContent
                 currentPhase={currentPhase}
                 currentWord={currentWord}
                 feedback={feedback}
@@ -119,7 +119,7 @@ function TestPage() {
         );
       case TEST_PHASES.RESULTS:
         return (
-          <ResultsPage 
+          <ResultsPage
             testResults={testResults}
             biasType={biasType}
             biasLevel={biasLevel}
@@ -135,34 +135,44 @@ function TestPage() {
         );
       case TEST_PHASES.VIDEO_A:
         return (
-          <VideoPage 
-            onContinue={moveToNextPhase} 
+          <VideoPage
+            onContinue={moveToNextPhase}
             videoType="A"
             biasResultSuffix={getBiasResultSuffix()}
           />
         );
       case TEST_PHASES.SURVEY_A:
         return (
-          <SurveyPage 
+          <SurveyPage
             onComplete={moveToNextPhase}
             surveyType="A"
             biasResultSuffix={getBiasResultSuffix()}
+            d1Score={d1Score}
+            d2Score={d2Score}
+            d3Score={d3Score}
+            d4Score={d4Score}
+            biasLevel={biasLevel}
           />
         );
       case TEST_PHASES.VIDEO_B:
         return (
-          <VideoPage 
-            onContinue={moveToNextPhase} 
+          <VideoPage
+            onContinue={moveToNextPhase}
             videoType="B"
             biasResultSuffix={getBiasResultSuffix()}
           />
         );
       case TEST_PHASES.SURVEY_B:
         return (
-          <SurveyPage 
+          <SurveyPage
             onComplete={moveToNextPhase}
             surveyType="B"
             biasResultSuffix={getBiasResultSuffix()}
+            d1Score={d1Score}
+            d2Score={d2Score}
+            d3Score={d3Score}
+            d4Score={d4Score}
+            biasLevel={biasLevel}
           />
         );
       case TEST_PHASES.COMPLETED:

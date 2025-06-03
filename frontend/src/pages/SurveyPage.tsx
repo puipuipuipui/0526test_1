@@ -8,9 +8,14 @@ interface SurveyPageProps {
   onComplete: () => void;
   surveyType: 'A' | 'B'; // 區分是問卷A還是問卷B
   biasResultSuffix?: string; // 傳入偏見結果後綴
+  d1Score?: number; // D1分數 (性別-電腦類聯想)
+  d2Score?: number; // D2分數 (性別-護膚類聯想)
+  d3Score?: number; // D3分數 (男性-產品類別聯想)
+  d4Score?: number; // D4分數 (女性-產品類別聯想)
+  biasLevel?: string; // 偏見程度
 }
 
-function SurveyPage({ onComplete, surveyType, biasResultSuffix }: SurveyPageProps) {
+function SurveyPage({ onComplete, surveyType, biasResultSuffix, d1Score = 0, d2Score = 0, d3Score = 0, d4Score = 0, biasLevel = '' }: SurveyPageProps) {
   // 倒數計時器狀態
   const [countdown, setCountdown] = useState<number>(10);
   // 問卷開始填寫標記
@@ -22,40 +27,130 @@ function SurveyPage({ onComplete, surveyType, biasResultSuffix }: SurveyPageProp
   useEffect(() => {
     const userId = localStorage.getItem('userId');
     if (userId) {
-      let googleFormBaseUrl = '';
+      let googleFormUrl = '';
       let userIdSuffix = '';
+      let surveyDescription = '';
 
       // 判斷是女性與電腦類偏見還是男性與護膚類偏見
       const isFemaleComputerBias = biasResultSuffix === '_girl';
       const isMaleSkinceBias = biasResultSuffix === '_boy';
 
+      // 當沒有明顯偏見時，根據D值最高的類別決定問卷類型
+      const determineQuestionnaireType = () => {
+        if (biasLevel === '無或極弱偏見') {
+          // 找出絕對值最大的D分數
+          const d1Abs = Math.abs(d1Score);
+          const d2Abs = Math.abs(d2Score);
+          const d3Abs = Math.abs(d3Score);
+          const d4Abs = Math.abs(d4Score);
+          
+          const maxD = Math.max(d1Abs, d2Abs, d3Abs, d4Abs);
+          
+          // 根據最大D分數來決定類別
+          if (maxD === d1Abs && d1Score !== 0) {
+            // D1最大 - 性別-電腦類聯想最強 -> 使用電腦類問卷
+            return 'computer';
+          } else if (maxD === d2Abs && d2Score !== 0) {
+            // D2最大 - 性別-護膚類聯想最強 -> 使用護膚類問卷
+            return 'skincare';
+          } else if (maxD === d3Abs && d3Score !== 0) {
+            // D3最大 - 男性-產品類別聯想最強
+            if (d3Score > 0) {
+              return 'skincare'; // 男性與護膚類
+            } else {
+              return 'computer'; // 男性與電腦類（反向）
+            }
+          } else if (maxD === d4Abs && d4Score !== 0) {
+            // D4最大 - 女性-產品類別聯想最強
+            if (d4Score > 0) {
+              return 'computer'; // 女性與電腦類
+            } else {
+              return 'skincare'; // 女性與護膚類（反向）
+            }
+          }
+          
+          // 如果所有D分數都很小或為0，預設使用電腦類
+          return 'computer';
+        }
+        
+        // 有明顯偏見時，依照原本的邏輯
+        return isFemaleComputerBias ? 'computer' : 'skincare';
+      };
+
+      const questionnaireType = determineQuestionnaireType();
+
       if (isFemaleComputerBias) {
-        // 測驗結果為「女性與電腦類」偏見 - 兩個問卷都使用電競滑鼠問卷
-        googleFormBaseUrl = 'https://docs.google.com/forms/d/e/1FAIpQLScGpRx--MVNEsdJAS4swRRlsNCJKxQwvefGiLMLKF2tV5ALpw/viewform?usp=pp_url&entry.1526772147=';
-        userIdSuffix = `${userId}_girl_${surveyType}`;
+        // 測驗結果為「女性與電腦類」偏見
+        if (surveyType === 'A') {
+          // 影片A：女性與電腦類產品 -> 女+電競滑鼠問卷
+          googleFormUrl = 'https://forms.gle/wS5B1SFpsABLDQZr6';
+          userIdSuffix = `${userId}_girl_A`;
+          surveyDescription = '女性與電競滑鼠問卷';
+        } else {
+          // 影片B：男性與電腦類產品 -> 男+電競滑鼠問卷
+          googleFormUrl = 'https://forms.gle/vhNbMNrbrT7VaWqCA';
+          userIdSuffix = `${userId}_girl_B`;
+          surveyDescription = '男性與電競滑鼠問卷';
+        }
       } else if (isMaleSkinceBias) {
-        // 測驗結果為「男性與護膚類」偏見 - 兩個問卷都使用面膜問卷
-        googleFormBaseUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSeeFuB-d1knFNPQvO0TlRQy8zGuwNf97ZPhQLBcDQPMa7fULA/viewform?usp=pp_url&entry.1526772147=';
-        userIdSuffix = `${userId}_boy_${surveyType}`;
+        // 測驗結果為「男性與護膚類」偏見
+        if (surveyType === 'A') {
+          // 影片A：男性與護膚類產品 -> 男+面膜問卷
+          googleFormUrl = 'https://forms.gle/ktajQyuToUknD7Li8';
+          userIdSuffix = `${userId}_boy_A`;
+          surveyDescription = '男性與面膜問卷';
+        } else {
+          // 影片B：女性與護膚類產品 -> 女+面膜問卷
+          googleFormUrl = 'https://forms.gle/GQuHugyctxLZ7mcW8';
+          userIdSuffix = `${userId}_boy_B`;
+          surveyDescription = '女性與面膜問卷';
+        }
       } else {
-        // 測驗結果為「沒有明顯的性別商品偏見」- 預設使用電競滑鼠問卷
-        googleFormBaseUrl = 'https://docs.google.com/forms/d/e/1FAIpQLScGpRx--MVNEsdJAS4swRRlsNCJKxQwvefGiLMLKF2tV5ALpw/viewform?usp=pp_url&entry.1526772147=';
-        userIdSuffix = `${userId}_none_${surveyType}`;
+        // 測驗結果為「沒有明顯的性別商品偏見」- 根據D值最高的類別決定問卷
+        if (questionnaireType === 'computer') {
+          // 使用電腦類問卷
+          if (surveyType === 'A') {
+            // 影片A：女性與電腦類產品 -> 女+電競滑鼠問卷
+            googleFormUrl = 'https://forms.gle/wS5B1SFpsABLDQZr6';
+            userIdSuffix = `${userId}_none_A`;
+            surveyDescription = '女性與電競滑鼠問卷（基於D值分析）';
+          } else {
+            // 影片B：男性與電腦類產品 -> 男+電競滑鼠問卷
+            googleFormUrl = 'https://forms.gle/vhNbMNrbrT7VaWqCA';
+            userIdSuffix = `${userId}_none_B`;
+            surveyDescription = '男性與電競滑鼠問卷（基於D值分析）';
+          }
+        } else {
+          // 使用護膚類問卷
+          if (surveyType === 'A') {
+            // 影片A：男性與護膚類產品 -> 男+面膜問卷
+            googleFormUrl = 'https://forms.gle/ktajQyuToUknD7Li8';
+            userIdSuffix = `${userId}_none_A`;
+            surveyDescription = '男性與面膜問卷（基於D值分析）';
+          } else {
+            // 影片B：女性與護膚類產品 -> 女+面膜問卷
+            googleFormUrl = 'https://forms.gle/GQuHugyctxLZ7mcW8';
+            userIdSuffix = `${userId}_none_B`;
+            surveyDescription = '女性與面膜問卷（基於D值分析）';
+          }
+        }
       }
       
-      const googleFormWithUserId = `${googleFormBaseUrl}${userIdSuffix}`;
-      setSurveyUrl(googleFormWithUserId);
+      setSurveyUrl(googleFormUrl);
       
       console.log(`🔗 第${surveyType === 'A' ? '一' : '二'}份問卷連結已準備完成:`, userIdSuffix);
-      console.log(`📋 第${surveyType === 'A' ? '一' : '二'}份問卷類型:`, 
-        (isFemaleComputerBias || (!isFemaleComputerBias && !isMaleSkinceBias)) ? '電競滑鼠問卷' : '面膜問卷'
-      );
+      console.log(`📋 第${surveyType === 'A' ? '一' : '二'}份問卷類型:`, surveyDescription);
+      console.log(`🌐 問卷URL:`, googleFormUrl);
+      if (biasLevel === '無或極弱偏見') {
+        console.log(`📊 D分數分析: D1=${d1Score.toFixed(3)}, D2=${d2Score.toFixed(3)}, D3=${d3Score.toFixed(3)}, D4=${d4Score.toFixed(3)}`);
+        console.log(`🎯 選擇問卷類型: ${questionnaireType} (基於最高D值)`);
+      }
     } else {
       console.warn('⚠️  找不到用戶 ID，可能會影響資料匹配');
-      // 如果沒有 user ID，使用預設問卷
-      setSurveyUrl('https://docs.google.com/forms/d/e/1FAIpQLScGpRx--MVNEsdJAS4swRRlsNCJKxQwvefGiLMLKF2tV5ALpw/viewform');
+      // 如果沒有 user ID，使用預設問卷（女+電競滑鼠）
+      setSurveyUrl('https://forms.gle/wS5B1SFpsABLDQZr6');
     }
-  }, [surveyType, biasResultSuffix]);
+  }, [surveyType, biasResultSuffix, d1Score, d2Score, d3Score, d4Score, biasLevel]);
 
   // 啟動倒數計時
   useEffect(() => {
@@ -101,11 +196,23 @@ function SurveyPage({ onComplete, surveyType, biasResultSuffix }: SurveyPageProp
     const isMaleSkinceBias = biasResultSuffix === '_boy';
 
     if (isFemaleComputerBias) {
-      return '電競滑鼠相關問卷';
+      if (surveyType === 'A') {
+        return '女性與電競滑鼠相關問卷';
+      } else {
+        return '男性與電競滑鼠相關問卷';
+      }
     } else if (isMaleSkinceBias) {
-      return '面膜相關問卷';
+      if (surveyType === 'A') {
+        return '男性與面膜相關問卷';
+      } else {
+        return '女性與面膜相關問卷';
+      }
     } else {
-      return '電競滑鼠相關問卷（預設）';
+      if (surveyType === 'A') {
+        return '女性與電競滑鼠相關問卷（預設）';
+      } else {
+        return '男性與電競滑鼠相關問卷（預設）';
+      }
     }
   };
 
@@ -124,7 +231,7 @@ function SurveyPage({ onComplete, surveyType, biasResultSuffix }: SurveyPageProp
           background: 'linear-gradient(135deg, #f5f7fa 0%, #eef2f7 100%)'
         }}
         styles={{
-          body: { padding: '32px' }  // ✅ 添加這個新的 styles 屬性
+          body: { padding: '32px' }
         }}
       >
         {/* 問卷內容 */}
@@ -158,9 +265,9 @@ function SurveyPage({ onComplete, surveyType, biasResultSuffix }: SurveyPageProp
               }}>
                 接下來請點選下方按鈕前往填寫問卷，您的回覆將有助於我們了解您在與聊天機器人互動過程中的想法與感受。整份問卷僅需數分鐘完成，請依據您的真實感受作答。
               </Paragraph>
-              {/* <Text type="secondary" style={{ fontSize: '1rem' }}>
+              <Text type="secondary" style={{ fontSize: '1rem' }}>
                 問卷類型：{getSurveyTypeDescription()}
-              </Text> */}
+              </Text>
             </div>
           </div>
           
