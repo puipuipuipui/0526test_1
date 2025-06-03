@@ -133,14 +133,22 @@ function TestPage() {
             onContinue={moveToNextPhase}
           />
         );
+      // 在 TestPage.tsx 的 renderPhase 函數中，修改以下案例：
+
       case TEST_PHASES.VIDEO_A:
         return (
           <VideoPage
             onContinue={moveToNextPhase}
             videoType="A"
             biasResultSuffix={getBiasResultSuffix()}
+            d1Score={d1Score}
+            d2Score={d2Score}
+            d3Score={d3Score}
+            d4Score={d4Score}
+            biasLevel={biasLevel}
           />
         );
+
       case TEST_PHASES.SURVEY_A:
         return (
           <SurveyPage
@@ -154,14 +162,21 @@ function TestPage() {
             biasLevel={biasLevel}
           />
         );
+
       case TEST_PHASES.VIDEO_B:
         return (
           <VideoPage
             onContinue={moveToNextPhase}
             videoType="B"
             biasResultSuffix={getBiasResultSuffix()}
+            d1Score={d1Score}
+            d2Score={d2Score}
+            d3Score={d3Score}
+            d4Score={d4Score}
+            biasLevel={biasLevel}
           />
         );
+
       case TEST_PHASES.SURVEY_B:
         return (
           <SurveyPage

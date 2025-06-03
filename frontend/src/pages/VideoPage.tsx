@@ -8,9 +8,23 @@ interface VideoPageProps {
   onContinue: () => void;
   videoType: 'A' | 'B'; // 區分是影片A還是影片B
   biasResultSuffix?: string; // 傳入偏見結果後綴
+  d1Score?: number; // D1分數 (性別-電腦類聯想)
+  d2Score?: number; // D2分數 (性別-護膚類聯想)
+  d3Score?: number; // D3分數 (男性-產品類別聯想)
+  d4Score?: number; // D4分數 (女性-產品類別聯想)
+  biasLevel?: string; // 偏見程度
 }
 
-function VideoPage({ onContinue, videoType, biasResultSuffix }: VideoPageProps) {
+function VideoPage({ 
+  onContinue, 
+  videoType, 
+  biasResultSuffix, 
+  d1Score = 0, 
+  d2Score = 0, 
+  d3Score = 0, 
+  d4Score = 0, 
+  biasLevel = '' 
+}: VideoPageProps) {
   // 控制注意事項彈窗顯示
   const [noticeVisible, setNoticeVisible] = useState<boolean>(true);
   // 倒數計時器狀態
@@ -39,14 +53,59 @@ function VideoPage({ onContinue, videoType, biasResultSuffix }: VideoPageProps) 
     };
   }, [videoStarted, countdown]);
 
-  // 根據影片類型和偏見結果決定影片內容
-  const getVideoUrl = (): string => {
+  // 判斷影片類型的邏輯
+  const determineVideoType = () => {
     // 判斷是女性與電腦類偏見還是男性與護膚類偏見
     const isFemaleComputerBias = biasResultSuffix === '_girl';
     const isMaleSkinceBias = biasResultSuffix === '_boy';
 
-    if (isFemaleComputerBias) {
-      // 測驗結果為「女性與電腦類」偏見
+    // 當沒有明顯偏見時，根據D值最高的類別決定影片類型
+    if (biasLevel === '無或極弱偏見') {
+      // 找出絕對值最大的D分數
+      const d1Abs = Math.abs(d1Score);
+      const d2Abs = Math.abs(d2Score);
+      const d3Abs = Math.abs(d3Score);
+      const d4Abs = Math.abs(d4Score);
+      
+      const maxD = Math.max(d1Abs, d2Abs, d3Abs, d4Abs);
+      
+      // 根據最大D分數來決定類別
+      if (maxD === d1Abs && d1Score !== 0) {
+        // D1最大 - 性別-電腦類聯想最強 -> 使用電腦類影片
+        return 'computer';
+      } else if (maxD === d2Abs && d2Score !== 0) {
+        // D2最大 - 性別-護膚類聯想最強 -> 使用護膚類影片
+        return 'skincare';
+      } else if (maxD === d3Abs && d3Score !== 0) {
+        // D3最大 - 男性-產品類別聯想最強
+        if (d3Score > 0) {
+          return 'skincare'; // 男性與護膚類
+        } else {
+          return 'computer'; // 男性與電腦類（反向）
+        }
+      } else if (maxD === d4Abs && d4Score !== 0) {
+        // D4最大 - 女性-產品類別聯想最強
+        if (d4Score > 0) {
+          return 'computer'; // 女性與電腦類
+        } else {
+          return 'skincare'; // 女性與護膚類（反向）
+        }
+      }
+      
+      // 如果所有D分數都很小或為0，預設使用電腦類
+      return 'computer';
+    }
+    
+    // 有明顯偏見時，依照原本的邏輯
+    return isFemaleComputerBias ? 'computer' : 'skincare';
+  };
+
+  // 根據影片類型和偏見結果決定影片內容
+  const getVideoUrl = (): string => {
+    const videoCategory = determineVideoType();
+
+    if (videoCategory === 'computer') {
+      // 電腦類產品影片
       if (videoType === 'A') {
         // 影片A：女性與電腦類產品
         return 'https://www.youtube.com/embed/UeFxb25vCq8?rel=0&modestbranding=1';
@@ -54,8 +113,8 @@ function VideoPage({ onContinue, videoType, biasResultSuffix }: VideoPageProps) 
         // 影片B：男性與電腦類產品
         return 'https://www.youtube.com/embed/wNQcKlysvwE?rel=0&modestbranding=1';
       }
-    } else if (isMaleSkinceBias) {
-      // 測驗結果為「男性與護膚類」偏見
+    } else {
+      // 護膚類產品影片
       if (videoType === 'A') {
         // 影片A：男性與護膚類產品
         return 'https://www.youtube.com/embed/fans7Uk4A2E?rel=0&modestbranding=1';
@@ -63,40 +122,24 @@ function VideoPage({ onContinue, videoType, biasResultSuffix }: VideoPageProps) 
         // 影片B：女性與護膚類產品
         return 'https://www.youtube.com/embed/9Q5aFOGdR5Q?rel=0&modestbranding=1';
       }
-    } else {
-      // 測驗結果為「沒有明顯的性別商品偏見」- 使用預設邏輯（女性與電腦類）
-      if (videoType === 'A') {
-        // 影片A：女性與電腦類產品
-        return 'https://www.youtube.com/embed/UeFxb25vCq8?rel=0&modestbranding=1';
-      } else {
-        // 影片B：男性與電腦類產品
-        return 'https://www.youtube.com/embed/wNQcKlysvwE?rel=0&modestbranding=1';
-      }
     }
   };
 
   // 獲取影片標題
   const getVideoTitle = (): string => {
-    const isFemaleComputerBias = biasResultSuffix === '_girl';
-    const isMaleSkinceBias = biasResultSuffix === '_boy';
+    const videoCategory = determineVideoType();
 
-    if (isFemaleComputerBias) {
+    if (videoCategory === 'computer') {
       if (videoType === 'A') {
         return '第一部聊天機器人互動影片（女性與電腦產品）';
       } else {
         return '第二部聊天機器人互動影片（男性與電腦產品）';
       }
-    } else if (isMaleSkinceBias) {
+    } else {
       if (videoType === 'A') {
         return '第一部聊天機器人互動影片（男性與護膚產品）';
       } else {
         return '第二部聊天機器人互動影片（女性與護膚產品）';
-      }
-    } else {
-      if (videoType === 'A') {
-        return '第一部聊天機器人互動影片（女性與電腦產品）';
-      } else {
-        return '第二部聊天機器人互動影片（男性與電腦產品）';
       }
     }
   };
@@ -107,9 +150,21 @@ function VideoPage({ onContinue, videoType, biasResultSuffix }: VideoPageProps) 
     return countdown > 0 ? `前往${suffix} (${countdown}s)` : `前往${suffix}`;
   };
 
+  // 調試信息
+  useEffect(() => {
+    const videoCategory = determineVideoType();
+    console.log(`🎬 第${videoType === 'A' ? '一' : '二'}部影片類型決定:`);
+    console.log(`📊 偏見結果: ${biasResultSuffix}, 偏見程度: ${biasLevel}`);
+    if (biasLevel === '無或極弱偏見') {
+      console.log(`📊 D分數分析: D1=${d1Score.toFixed(3)}, D2=${d2Score.toFixed(3)}, D3=${d3Score.toFixed(3)}, D4=${d4Score.toFixed(3)}`);
+      console.log(`🎯 選擇影片類型: ${videoCategory} (基於最高D值)`);
+    }
+    console.log(`🌐 影片URL: ${getVideoUrl()}`);
+  }, [videoType, biasResultSuffix, d1Score, d2Score, d3Score, d4Score, biasLevel]);
+
   return (
     <div className="wide-container">
-      {/* 影片注意事項彈跳視窗 - 修正 bodyStyle 為 styles.body */}
+      {/* 影片注意事項彈跳視窗 */}
       <Modal
         title={
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 0' }}>
