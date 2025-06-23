@@ -132,9 +132,9 @@ function BrowserWarning({ onAcknowledge }: BrowserWarningProps) {
 
         {/* 瀏覽器資訊 */}
         <div style={{ marginBottom: '20px' }}>
-          <Paragraph style={{ fontSize: '16px', marginBottom: '12px' }}>
+          {/* <Paragraph style={{ fontSize: '16px', marginBottom: '12px' }}>
             <Text strong>目前瀏覽器：</Text>{browserInfo}
-          </Paragraph>
+          </Paragraph> */}
           
           {isChrome ? (
             <Alert
