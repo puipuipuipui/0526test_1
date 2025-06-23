@@ -111,13 +111,13 @@ function VideoPage({
         return 'https://www.youtube.com/embed/UeFxb25vCq8?rel=0&modestbranding=1';
       } else {
         // 影片B：男性與電腦類產品
-        return 'https://www.youtube.com/embed/qayYffXwIYI?rel=0&modestbranding=1';
+        return 'https://www.youtube.com/embed/RL3MMyaw9gU?rel=0&modestbranding=1';
       }
     } else {
       // 護膚類產品影片
       if (videoType === 'A') {
         // 影片A：男性與護膚類產品
-        return 'https://www.youtube.com/embed/EQiwuYMlnzs?rel=0&modestbranding=1';
+        return 'https://www.youtube.com/embed/3PAvZg6gK14?rel=0&modestbranding=1';
       } else {
         // 影片B：女性與護膚類產品
         return 'https://www.youtube.com/embed/9Q5aFOGdR5Q?rel=0&modestbranding=1';

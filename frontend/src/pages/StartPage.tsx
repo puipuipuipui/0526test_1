@@ -86,7 +86,7 @@ function StartPage({ onStart }: StartPageProps) {
               注意事項
             </Title>
             <Paragraph style={{ fontSize: '1.125rem', marginBottom: '24px' }}>
-              整體過程約需 10 分鐘，請您在安靜、不受干擾的環境中進行，並專心完成每一個步驟。
+              整體過程約需 15-20 分鐘，請您在安靜、不受干擾的環境中進行，並專心完成每一個步驟。
             </Paragraph>
           </div>
 
