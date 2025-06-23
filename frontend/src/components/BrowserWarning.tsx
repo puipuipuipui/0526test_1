@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Typography, Alert, Space } from 'antd';
-import { ExclamationCircleOutlined, ChromeOutlined, WarningOutlined } from '@ant-design/icons';
+import { Modal, Button, Typography, Alert, Space, Divider } from 'antd';
+import { InfoCircleOutlined, ChromeOutlined, CheckCircleOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -43,7 +43,7 @@ function BrowserWarning({ onAcknowledge }: BrowserWarningProps) {
     setIsChrome(isChromeBrowser);
     setBrowserInfo(browserName);
     
-    // 總是顯示警告，讓使用者確認瀏覽器狀況
+    // 總是顯示提示，讓使用者了解測驗環境
     setIsVisible(true);
   }, []);
 
@@ -52,7 +52,7 @@ function BrowserWarning({ onAcknowledge }: BrowserWarningProps) {
     onAcknowledge();
   };
 
-  const handleDownloadChrome = () => {
+  const handleChromeInfo = () => {
     window.open('https://www.google.com/chrome/', '_blank');
   };
 
@@ -60,13 +60,9 @@ function BrowserWarning({ onAcknowledge }: BrowserWarningProps) {
     <Modal
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px 0' }}>
-          {isChrome ? (
-            <ChromeOutlined style={{ color: '#4285f4', fontSize: '28px' }} />
-          ) : (
-            <WarningOutlined style={{ color: '#ff4d4f', fontSize: '28px' }} />
-          )}
-          <span style={{ fontSize: '20px', fontWeight: 600 }}>
-            {isChrome ? '瀏覽器確認' : '瀏覽器相容性警告'}
+          <InfoCircleOutlined style={{ color: '#1890ff', fontSize: '24px' }} />
+          <span style={{ fontSize: '18px', fontWeight: 500 }}>
+            測驗環境說明
           </span>
         </div>
       }
@@ -74,17 +70,19 @@ function BrowserWarning({ onAcknowledge }: BrowserWarningProps) {
       footer={[
         !isChrome && (
           <Button
-            key="download"
+            key="info"
             icon={<ChromeOutlined />}
-            onClick={handleDownloadChrome}
+            onClick={handleChromeInfo}
             style={{
-              padding: '0 24px',
-              height: '42px',
-              fontSize: '16px',
-              borderRadius: '6px'
+              padding: '0 20px',
+              height: '40px',
+              fontSize: '15px',
+              borderRadius: '6px',
+              borderColor: '#fa8c16',
+              color: '#fa8c16'
             }}
           >
-            下載 Chrome 瀏覽器
+            取得 Chrome 瀏覽器
           </Button>
         ),
         <Button
@@ -94,144 +92,128 @@ function BrowserWarning({ onAcknowledge }: BrowserWarningProps) {
           onClick={handleAcknowledge}
           style={{
             padding: '0 32px',
-            height: '42px',
-            fontSize: '16px',
-            borderRadius: '6px',
-            backgroundColor: isChrome ? '#52c41a' : '#ff7a45',
-            borderColor: isChrome ? '#52c41a' : '#ff7a45'
+            height: '40px',
+            fontSize: '15px',
+            borderRadius: '6px'
           }}
         >
-          {isChrome ? '確認並開始測驗' : '我了解風險，繼續測驗'}
+          開始測驗
         </Button>
       ].filter(Boolean)}
       centered
       maskClosable={false}
       closable={false}
-      width={700}
+      width={650}
       styles={{
         body: {
-          padding: '32px 36px',
-          backgroundColor: '#fafafa',
-          borderRadius: '0 0 12px 12px'
+          padding: '24px 32px',
+          backgroundColor: '#ffffff'
         }
       }}
       style={{
-        borderRadius: '12px',
-        overflow: 'hidden'
+        borderRadius: '8px'
       }}
     >
-      <div className="browser-warning-content">
-        {/* 當前瀏覽器資訊 */}
-        <Alert
-          message={`檢測到您目前使用的瀏覽器：${browserInfo}`}
-          type={isChrome ? 'success' : 'warning'}
-          icon={isChrome ? <ChromeOutlined /> : <ExclamationCircleOutlined />}
-          style={{
-            marginBottom: '24px',
-            borderRadius: '8px',
-            fontSize: '16px'
-          }}
-        />
-
-        {isChrome ? (
-          // Chrome 用戶的確認訊息
-          <div className="chrome-confirmation">
-            <div style={{
-              padding: '24px',
-              backgroundColor: 'white',
-              borderRadius: '12px',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
-              borderLeft: '4px solid #52c41a',
-              marginBottom: '20px'
-            }}>
-              <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                {/* <div>
-                  <Title level={4} style={{ color: '#52c41a', margin: '0 0 12px 0' }}>
-                    ✅ 瀏覽器相容性良好
-                  </Title>
-                  <Paragraph style={{ fontSize: '16px', margin: 0, lineHeight: '1.6' }}>
-                    太好了！您正在使用 Google Chrome 瀏覽器，這是我們推薦的瀏覽器。
-                    這將確保您在測驗過程中獲得最佳體驗。
-                  </Paragraph>
-                </div> */}
-              </Space>
-            </div>
-
-            <div style={{
-              padding: '20px',
-              backgroundColor: 'white',
-              borderRadius: '8px',
-              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.05)',
-              borderLeft: '4px solid #1890ff'
-            }}>
-              <Paragraph style={{ fontSize: '15px', margin: 0, lineHeight: '1.6' }}>
-                <strong>測驗注意事項：</strong><br/>
-                • 請確保網路連線穩定<br/>
-                • 測驗過程中請勿刷新頁面或返回上一頁<br/>
-                • 建議關閉其他不必要的分頁以確保最佳效能<br/>
-                • 完整測驗時間約需 15-20 分鐘
-              </Paragraph>
-            </div>
-          </div>
-        ) : (
-          // 非 Chrome 用戶的警告
-          <div className="browser-warning">
-            <div style={{
-              padding: '24px',
-              backgroundColor: 'white',
-              borderRadius: '12px',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
-              borderLeft: '4px solid #ff4d4f',
-              marginBottom: '20px'
-            }}>
-              <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                <div>
-                  <Title level={4} style={{ color: '#ff4d4f', margin: '0 0 12px 0' }}>
-                    ⚠️ 瀏覽器相容性警告
-                  </Title>
-                  <Paragraph style={{ fontSize: '16px', margin: '0 0 16px 0', lineHeight: '1.6' }}>
-                    我們<Text strong style={{ color: '#ff4d4f' }}>強烈建議您使用 Google Chrome 瀏覽器</Text>來進行此項測驗。
-                  </Paragraph>
-                  
-                  <Paragraph style={{ fontSize: '15px', margin: 0, lineHeight: '1.6' }}>
-                    <Text strong>使用非Chrome瀏覽器可能遇到的問題：</Text><br/>
-                    • 問卷可能會突然跳出或無法正常載入<br/>
-                    {/* • 填寫完成後可能無法返回繼續測驗<br/>
-                    • 某些功能可能無法正常運作<br/>
-                    • 資料可能無法正確儲存<br/>
-                    • 影片播放可能有問題 */}
-                  </Paragraph>
-                </div>
-              </Space>
-            </div>
-
-            <div style={{
-              padding: '20px',
-              backgroundColor: 'white',
-              borderRadius: '8px',
-              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.05)',
-              borderLeft: '4px solid #fa8c16'
-            }}>
-              <Paragraph style={{ fontSize: '15px', margin: 0, lineHeight: '1.6' }}>
-                <Text strong>建議操作：</Text><br/>
-                1. 點擊「下載 Chrome 瀏覽器」按鈕下載並安裝 Chrome<br/>
-                2. 安裝完成後，請使用 Chrome 重新開啟此測驗<br/>
-                3. 如果堅持使用目前瀏覽器，請確保網路穩定且不要中途關閉分頁
-              </Paragraph>
-            </div>
-          </div>
-        )}
-
+      <div className="browser-info-content">
+        {/* 學術研究聲明 */}
         <div style={{
-          marginTop: '24px',
-          padding: '16px',
-          backgroundColor: '#f0f2f5',
+          padding: '16px 20px',
+          backgroundColor: '#f6f8ff',
           borderRadius: '8px',
-          textAlign: 'center'
+          marginBottom: '20px',
+          border: '1px solid #e6f0ff'
         }}>
           <Text style={{ fontSize: '14px', color: '#666' }}>
-            此測驗包含內隱聯結測驗、影片觀看及問卷調查等多個階段<br/>
-            確保瀏覽器相容性有助於您順利完成整個流程
+            國立高雄科技大學智慧商務研究所學術研究<br />
+            聯絡信箱：jessica910513@gmail.com<br />
+            聯絡人：林鈺憓 國立高雄科技大學智慧商務研究所 碩士生
+          </Text>
+        </div>
+
+        {/* 瀏覽器資訊 */}
+        <div style={{ marginBottom: '20px' }}>
+          <Paragraph style={{ fontSize: '16px', marginBottom: '12px' }}>
+            <Text strong>目前瀏覽器：</Text>{browserInfo}
+          </Paragraph>
+          
+          {isChrome ? (
+            <Alert
+              message="✅ 建議的測驗環境"
+              description="您使用的 Chrome 瀏覽器與我們的測驗系統具有良好相容性"
+              type="success"
+              icon={<CheckCircleOutlined />}
+              style={{ borderRadius: '6px' }}
+            />
+          ) : (
+            <div>
+              <Alert
+                message="⚠️ 重要提醒：強烈建議使用 Chrome 瀏覽器"
+                description="使用其他瀏覽器可能導致問卷系統跳出，填寫完成後無法返回繼續測驗"
+                type="warning"
+                icon={<InfoCircleOutlined />}
+                style={{ borderRadius: '6px', marginBottom: '12px' }}
+              />
+              <div style={{
+                padding: '12px 16px',
+                backgroundColor: '#fff7e6',
+                borderRadius: '6px',
+                border: '1px solid #ffd591'
+              }}>
+                <Text style={{ fontSize: '14px', color: '#d46b08' }}>
+                  <Text strong>常見問題：</Text>使用非Chrome瀏覽器時，外部問卷可能會在新視窗開啟，
+                  完成後可能無法自動返回測驗頁面，導致測驗中斷。
+                </Text>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <Divider style={{ margin: '20px 0' }} />
+
+
+        {/* 技術建議 */}
+        <div style={{
+          padding: '16px',
+          backgroundColor: '#fafafa',
+          borderRadius: '6px',
+          border: '1px solid #f0f0f0'
+        }}>
+          <Title level={5} style={{ color: '#333', marginBottom: '12px', fontSize: '14px' }}>
+            為了確保順暢的測驗體驗，建議您：
+          </Title>
+          <Space direction="vertical" size="small" style={{ width: '100%' }}>
+            <Text style={{ fontSize: '14px', color: '#666' }}>
+              • 確保網路連線穩定
+            </Text>
+            <Text style={{ fontSize: '14px', color: '#666' }}>
+              • 測驗過程中保持專注，請勿關閉本測驗頁面
+            </Text>
+            <Text style={{ fontSize: '14px', color: '#666' }}>
+              • 準備 15-20 分鐘的完整時間
+            </Text>
+            {!isChrome && (
+              <>
+                <Text style={{ fontSize: '14px', color: '#fa8c16', fontWeight: 'bold' }}>
+                  • ⚠️ 強烈建議使用 Chrome 瀏覽器，避免問卷跳出問題
+                </Text>
+                <Text style={{ fontSize: '13px', color: '#fa8c16' }}>
+                  &nbsp;&nbsp;其他瀏覽器可能無法正確處理問卷系統的跳轉
+                </Text>
+              </>
+            )}
+          </Space>
+        </div>
+
+        {/* 資料保護聲明 */}
+        <div style={{
+          marginTop: '20px',
+          padding: '12px',
+          backgroundColor: '#f9f9f9',
+          borderRadius: '6px',
+          textAlign: 'center'
+        }}>
+          <Text style={{ fontSize: '13px', color: '#888' }}>
+            您的所有資料將被匿名處理，僅用於學術研究目的
           </Text>
         </div>
       </div>
