@@ -189,7 +189,7 @@ function BrowserWarning({ onAcknowledge }: BrowserWarningProps) {
               • 測驗過程中保持專注，請勿關閉本測驗頁面
             </Text>
             <Text style={{ fontSize: '14px', color: '#666' }}>
-              • 準備 15-20 分鐘的完整時間
+              • 準備 10-15 分鐘的完整時間
             </Text>
             {!isChrome && (
               <>
