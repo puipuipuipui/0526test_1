@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "機器人性別設計研究",
+  "name": "擬人化機器人性別設計與產品刻板印象對購買意圖的影響",
+  "description": "國立高雄科技大學智慧商務研究所學術研究",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +21,9 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#1890ff",
+  "background_color": "#f0f2f5",
+  "lang": "zh-TW",
+  "scope": "/",
+  "orientation": "portrait-primary"
 }
