@@ -35,9 +35,9 @@ function SurveyPage({
   useEffect(() => {
     const updateHeight = () => {
       if (window.innerWidth < 768) {
-        setIframeHeight('60vh'); // 手機使用視窗高度的70%
+        setIframeHeight('500px'); // 手機使用視窗高度
       } else {
-        setIframeHeight('600px'); // 電腦使用固定900px
+        setIframeHeight('600px'); // 電腦使用固定高度
       }
     };
 
