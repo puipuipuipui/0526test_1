@@ -30,20 +30,23 @@ function SurveyPage({
   const [surveyStarted, setSurveyStarted] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [iframeHeight, setIframeHeight] = useState<string>('900px');
+  const [iframeWidth, setIframeWidth] = useState<string>('100%');
 
-  // 根據螢幕尺寸設定iframe高度
+  // 根據螢幕尺寸設定iframe高度和寬度
   useEffect(() => {
-    const updateHeight = () => {
+    const updateDimensions = () => {
       if (window.innerWidth < 768) {
-        setIframeHeight('500px'); // 手機使用視窗高度
+        setIframeHeight('500px'); // 手機使用固定600px，確保能看到問卷
+        setIframeWidth('100%');   // 手機使用全寬
       } else {
-        setIframeHeight('600px'); // 電腦使用固定高度
+        setIframeHeight('600px'); // 電腦使用固定900px
+        setIframeWidth('90%');    // 電腦使用90%寬度，留一些邊距
       }
     };
 
-    updateHeight();
-    window.addEventListener('resize', updateHeight);
-    return () => window.removeEventListener('resize', updateHeight);
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
   // 啟動倒數計時
@@ -270,19 +273,21 @@ function SurveyPage({
             )}
             
             {/* 內嵌問卷 */}
-            <iframe
-              src={surveyUrl}
-              width="100%"
-              height={iframeHeight}
-              style={{ 
-                border: 'none',
-                borderRadius: '12px',
-                display: 'block'
-              }}
-              title={`第${surveyType === 'A' ? '一' : '二'}份問卷調查`}
-              onLoad={handleIframeLoad}
-              allowFullScreen
-            />
+            <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+              <iframe
+                src={surveyUrl}
+                width={iframeWidth}
+                height={iframeHeight}
+                style={{ 
+                  border: 'none',
+                  borderRadius: '12px',
+                  display: 'block'
+                }}
+                title={`第${surveyType === 'A' ? '一' : '二'}份問卷調查`}
+                onLoad={handleIframeLoad}
+                allowFullScreen
+              />
+            </div>
           </div>
         ) : (
           <div style={{ textAlign: 'center', padding: '60px 20px' }}>
