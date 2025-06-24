@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Typography, Space, Divider, message, Modal } from 'antd';
-import { FormOutlined, ArrowRightOutlined, ClockCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { Card, Button, Typography, Space, Divider, Spin } from 'antd';
+import { FormOutlined, ArrowRightOutlined, ClockCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -28,7 +28,23 @@ function SurveyPage({
   const [surveyUrl, setSurveyUrl] = useState<string>('');
   const [countdown, setCountdown] = useState<number>(10);
   const [surveyStarted, setSurveyStarted] = useState<boolean>(false);
-  const [showModal, setShowModal] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [iframeHeight, setIframeHeight] = useState<string>('900px');
+
+  // 根據螢幕尺寸設定iframe高度
+  useEffect(() => {
+    const updateHeight = () => {
+      if (window.innerWidth < 768) {
+        setIframeHeight('60vh'); // 手機使用視窗高度的70%
+      } else {
+        setIframeHeight('600px'); // 電腦使用固定900px
+      }
+    };
+
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+    return () => window.removeEventListener('resize', updateHeight);
+  }, []);
 
   // 啟動倒數計時
   useEffect(() => {
@@ -61,37 +77,37 @@ function SurveyPage({
       // 基於D值決定問卷類型的函數
       const determineQuestionnaireType = () => {
         const scores = [
-          { name: 'D1', score: d1Score },
-          { name: 'D2', score: d2Score },
-          { name: 'D3', score: d3Score },
-          { name: 'D4', score: d4Score }
+          { name: 'D1', score: Math.abs(d1Score) },
+          { name: 'D2', score: Math.abs(d2Score) },
+          { name: 'D3', score: Math.abs(d3Score) },
+          { name: 'D4', score: Math.abs(d4Score) }
         ];
         
-        const maxScore = Math.max(d1Score, d2Score, d3Score, d4Score);
+        const maxScore = Math.max(Math.abs(d1Score), Math.abs(d2Score), Math.abs(d3Score), Math.abs(d4Score));
         const maxScoreCategory = scores.find(s => s.score === maxScore);
         
-        return (maxScoreCategory?.name === 'D1' || maxScoreCategory?.name === 'D2') ? 'computer' : 'skincare';
+        return (maxScoreCategory?.name === 'D1' || maxScoreCategory?.name === 'D4') ? 'computer' : 'skincare';
       };
 
       if (isFemaleComputerBias) {
         // 測驗結果為「女性與電腦類」偏見
         if (surveyType === 'A') {
-          googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSe2wqmYqVSXptUJoKmFHJHw1aJMS5AcMy7UpKCkvd8_Qd_tgw/viewform?usp=pp_url&entry.1526772147=';
+          googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSe2wqmYqVSXptUJoKmFHJHw1aJMS5AcMy7UpKCkvd8_Qd_tgw/formResponse?embedded=true&entry.1526772147=';
           userIdSuffix = `${userId}_girl_A`;
           surveyDescription = '女性與電競滑鼠問卷';
         } else {
-          googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSf9N2zED6tC7VxWTI-Be9s2H0Q11KgtH5iG9BBFLyAU0n-LtQ/viewform?usp=pp_url&entry.1526772147=';
+          googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSf9N2zED6tC7VxWTI-Be9s2H0Q11KgtH5iG9BBFLyAU0n-LtQ/formResponse?embedded=true&entry.1526772147=';
           userIdSuffix = `${userId}_girl_B`;
           surveyDescription = '男性與電競滑鼠問卷';
         }
       } else if (isMaleSkinceBias) {
         // 測驗結果為「男性與護膚類」偏見
         if (surveyType === 'A') {
-          googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSeYnpJafO855tuK7QwWGkv3fXuB2L6gmBwlLNh77EilcA05iQ/viewform?usp=pp_url&entry.1526772147=';
+          googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSeYnpJafO855tuK7QwWGkv3fXuB2L6gmBwlLNh77EilcA05iQ/formResponse?embedded=true&entry.1526772147=';
           userIdSuffix = `${userId}_boy_A`;
           surveyDescription = '男性與面膜問卷';
         } else {
-          googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSdtUx2JZZpi4ABiyKvVmeLzZz1-i64-jr2U1K2NIXsixbrc6A/viewform?usp=pp_url&entry.1526772147=';
+          googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSdtUx2JZZpi4ABiyKvVmeLzZz1-i64-jr2U1K2NIXsixbrc6A/formResponse?embedded=true&entry.1526772147=';
           userIdSuffix = `${userId}_boy_B`;
           surveyDescription = '女性與面膜問卷';
         }
@@ -102,22 +118,22 @@ function SurveyPage({
         if (questionnaireType === 'computer') {
           // 使用電腦類問卷
           if (surveyType === 'A') {
-            googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSe2wqmYqVSXptUJoKmFHJHw1aJMS5AcMy7UpKCkvd8_Qd_tgw/viewform?usp=pp_url&entry.1526772147=';
+            googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSe2wqmYqVSXptUJoKmFHJHw1aJMS5AcMy7UpKCkvd8_Qd_tgw/formResponse?embedded=true&entry.1526772147=';
             userIdSuffix = `${userId}_none_A`;
             surveyDescription = '女性與電競滑鼠問卷（基於D值分析）';
           } else {
-            googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSf9N2zED6tC7VxWTI-Be9s2H0Q11KgtH5iG9BBFLyAU0n-LtQ/viewform?usp=pp_url&entry.1526772147=';
+            googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSf9N2zED6tC7VxWTI-Be9s2H0Q11KgtH5iG9BBFLyAU0n-LtQ/formResponse?embedded=true&entry.1526772147=';
             userIdSuffix = `${userId}_none_B`;
             surveyDescription = '男性與電競滑鼠問卷（基於D值分析）';
           }
         } else {
           // 使用護膚類問卷
           if (surveyType === 'A') {
-            googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSeYnpJafO855tuK7QwWGkv3fXuB2L6gmBwlLNh77EilcA05iQ/viewform?usp=pp_url&entry.1526772147=';
+            googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSeYnpJafO855tuK7QwWGkv3fXuB2L6gmBwlLNh77EilcA05iQ/formResponse?embedded=true&entry.1526772147=';
             userIdSuffix = `${userId}_none_A`;
             surveyDescription = '男性與面膜問卷（基於D值分析）';
           } else {
-            googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSdtUx2JZZpi4ABiyKvVmeLzZz1-i64-jr2U1K2NIXsixbrc6A/viewform?usp=pp_url&entry.1526772147=';
+            googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSdtUx2JZZpi4ABiyKvVmeLzZz1-i64-jr2U1K2NIXsixbrc6A/formResponse?embedded=true&entry.1526772147=';
             userIdSuffix = `${userId}_none_B`;
             surveyDescription = '女性與面膜問卷（基於D值分析）';
           }
@@ -138,7 +154,7 @@ function SurveyPage({
     } else {
       console.warn('⚠️  找不到用戶 ID，可能會影響資料匹配');
       // 如果沒有 user ID，使用預設問卷（女+電競滑鼠）
-      setSurveyUrl('https://docs.google.com/forms/d/e/1FAIpQLSe2wqmYqVSXptUJoKmFHJHw1aJMS5AcMy7UpKCkvd8_Qd_tgw/viewform?usp=pp_url&entry.1526772147=default_user');
+      setSurveyUrl('https://docs.google.com/forms/d/e/1FAIpQLSe2wqmYqVSXptUJoKmFHJHw1aJMS5AcMy7UpKCkvd8_Qd_tgw/formResponse?embedded=true&entry.1526772147=default_user');
     }
   }, [surveyType, biasResultSuffix, d1Score, d2Score, d3Score, d4Score, biasLevel]);
 
@@ -159,264 +175,169 @@ function SurveyPage({
   // 獲取描述文字
   const getDescriptionText = (): string => {
     if (surveyType === 'A') {
-      return '填寫完成後，請回到此頁面觀看第二部影片';
+      return '填寫完成後，請點擊下方按鈕觀看第二部影片';
     } else {
-      return '填寫完成後，請回到此頁面完成測試';
+      return '填寫完成後，請點擊下方按鈕完成測試';
     }
   };
 
-  // 改進的開啟問卷函數 - 解決 Safari 回退問題
-  const handleSurveyClick = () => {
-    setShowModal(true);
-  };
-
-  // 確認開啟問卷
-  const confirmOpenSurvey = () => {
-    setShowModal(false);
-    
-    // 記錄當前頁面狀態到 sessionStorage
-    sessionStorage.setItem('surveyPageState', JSON.stringify({
-      surveyType,
-      biasResultSuffix,
-      d1Score,
-      d2Score,
-      d3Score,
-      d4Score,
-      biasLevel,
-      timestamp: Date.now()
-    }));
-
-    // 記錄問卷開始時間
-    const startTime = Date.now();
-    sessionStorage.setItem('surveyStartTime', startTime.toString());
-    
+  // 處理iframe載入完成
+  const handleIframeLoad = () => {
+    setIsLoading(false);
     setSurveyStarted(true);
-    
-    // 使用 window.open 代替 href，這樣可以更好地控制新視窗
-    const newWindow = window.open(surveyUrl, '_blank', 'noopener,noreferrer');
-    
-    if (!newWindow) {
-      // 彈窗被阻擋時的備用方案
-      message.warning({
-        content: (
-          <div>
-            <div>彈出視窗被阻擋，請點擊下方連結手動開啟問卷：</div>
-            <a 
-              href={surveyUrl} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              style={{ color: '#1890ff', textDecoration: 'underline' }}
-            >
-              🔗 點此開啟問卷
-            </a>
-          </div>
-        ),
-        duration: 0, // 不自動關閉
-        style: { marginTop: '60px' }
-      });
-      return;
-    }
-
-    message.info({
-      content: '問卷已在新分頁開啟，填寫完成後請回到此頁面',
-      duration: 5,
-      style: { marginTop: '60px' }
-    });
-
-    // 監聽頁面焦點變化 - 當用戶從問卷頁面回來時
-    const handleFocus = () => {
-      const startTime = sessionStorage.getItem('surveyStartTime');
-      if (startTime) {
-        const elapsed = Date.now() - parseInt(startTime);
-        
-        // 如果經過超過 30 秒，假設用戶已經填寫問卷
-        if (elapsed > 30000) {
-          message.success({
-            content: '歡迎回來！如果您已完成問卷，請點擊下方按鈕繼續',
-            duration: 8,
-            style: { marginTop: '60px' }
-          });
-          
-          // 清除計時器記錄
-          sessionStorage.removeItem('surveyStartTime');
-        }
-      }
-    };
-
-    // 添加焦點監聽
-    window.addEventListener('focus', handleFocus);
-    
-    // 5分鐘後移除監聽器（避免記憶體洩漏）
-    setTimeout(() => {
-      window.removeEventListener('focus', handleFocus);
-    }, 300000);
   };
-
-  // 頁面載入時檢查是否有保存的狀態
-  useEffect(() => {
-    const savedState = sessionStorage.getItem('surveyPageState');
-    if (savedState) {
-      try {
-        const state = JSON.parse(savedState);
-        const timeDiff = Date.now() - state.timestamp;
-        
-        // 如果狀態是在 10 分鐘內保存的，顯示歡迎回來訊息
-        if (timeDiff < 600000) {
-          message.info({
-            content: '歡迎回來！您可以繼續進行測試',
-            duration: 5,
-            style: { marginTop: '60px' }
-          });
-        }
-        
-        // 清除已使用的狀態
-        sessionStorage.removeItem('surveyPageState');
-      } catch (error) {
-        console.warn('無法解析保存的頁面狀態');
-      }
-    }
-  }, []);
 
   return (
-    <div className="content-container" style={{ padding: '32px 0', maxWidth: '800px', margin: '0 auto' }}>
-      {/* 問卷確認彈窗 */}
-      <Modal
-        title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <ExclamationCircleOutlined style={{ color: '#1890ff' }} />
-            確認開啟問卷
-          </div>
-        }
-        open={showModal}
-        onOk={confirmOpenSurvey}
-        onCancel={() => setShowModal(false)}
-        okText="確定開啟"
-        cancelText="取消"
-        centered
-      >
-        <div style={{ padding: '16px 0' }}>
-          <Paragraph style={{ marginBottom: '16px', fontSize: '16px' }}>
-            點擊確定後，問卷將在新分頁中開啟。
-          </Paragraph>
-          <div style={{ 
-            backgroundColor: '#f6ffed', 
-            border: '1px solid #b7eb8f', 
-            borderRadius: '6px', 
-            padding: '12px',
-            marginBottom: '16px'
-          }}>
-            <Text strong style={{ color: '#389e0d' }}>
-              重要提醒：
-            </Text>
-            <ul style={{ margin: '8px 0 0 0', paddingLeft: '20px' }}>
-              <li>請保持此頁面開啟</li>
-              <li>填寫完問卷後請回到此頁面</li>
-              <li>如果不小心關閉此頁面，請重新開始測試</li>
-            </ul>
-          </div>
-        </div>
-      </Modal>
-
-      {/* 問卷卡片 */}
+    <div className="content-container" style={{ padding: '32px 0', maxWidth: '1000px', margin: '0 auto' }}>
+      
+      {/* 問卷標題區 */}
       <Card 
-        className="survey-card"
+        style={{ 
+          marginBottom: '24px', 
+          borderRadius: '12px',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)'
+        }}
+      >
+        <div style={{ textAlign: 'center' }}>
+          {/* <div 
+            style={{ 
+              width: '64px', 
+              height: '64px', 
+              backgroundColor: '#1890ff', 
+              borderRadius: '50%', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              margin: '0 auto 20px',
+              fontSize: '28px',
+              color: 'white'
+            }}
+          >
+            <FormOutlined />
+          </div> */}
+          
+          <Title level={2} style={{ margin: '0 0 16px', color: '#1890ff' }}>
+            {getTitle()}
+          </Title>
+          
+          <Paragraph style={{ 
+            fontSize: '1.125rem', 
+            color: 'rgba(0, 0, 0, 0.75)',
+            maxWidth: '600px',
+            margin: '0 auto'
+          }}>
+            請填寫以下問卷，您的回覆將有助於我們了解您在與聊天機器人互動過程中的想法與感受。
+            整份問卷僅需數分鐘完成，請依據您的真實感受作答。
+          </Paragraph>
+        </div>
+      </Card>
+
+      {/* 內嵌問卷區域 */}
+      <Card 
         style={{ 
           borderRadius: '12px',
           boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-          border: '1px solid #e8e8e8'
+          overflow: 'hidden',
+          marginBottom: '24px'
         }}
       >
-        <Space direction="vertical" size="large" style={{ width: '100%' }}>
-          <div style={{ textAlign: 'center' }}>
-            <div 
-              className="survey-icon" 
+        {surveyUrl ? (
+          <div style={{ position: 'relative', minHeight: iframeHeight }}>
+            {/* 載入提示 */}
+            {isLoading && (
+              <div 
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  zIndex: 10,
+                  background: 'white',
+                  padding: '32px',
+                  borderRadius: '12px',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+                  textAlign: 'center'
+                }}
+              >
+                <Spin 
+                  indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} 
+                  size="large" 
+                />
+                <div style={{ marginTop: '16px' }}>
+                  <Text style={{ fontSize: '16px', color: '#666' }}>問卷載入中...</Text>
+                </div>
+              </div>
+            )}
+            
+            {/* 內嵌問卷 */}
+            <iframe
+              src={surveyUrl}
+              width="100%"
+              height={iframeHeight}
               style={{ 
-                width: '80px', 
-                height: '80px', 
-                backgroundColor: '#1890ff', 
-                borderRadius: '50%', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                margin: '0 auto 24px',
-                fontSize: '36px',
-                color: 'white'
+                border: 'none',
+                borderRadius: '12px',
+                display: 'block'
               }}
-            >
-              <FormOutlined />
-            </div>
-            
-            <Title level={2} style={{ margin: '0 0 16px', color: '#1890ff' }}>
-              {getTitle()}
-            </Title>
-            
-            <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-              <Paragraph style={{ 
-                fontSize: '1.125rem', 
-                lineHeight: '1.6', 
-                color: 'rgba(0, 0, 0, 0.75)',
-                marginBottom: '12px'
-              }}>
-                接下來請點選下方按鈕前往填寫問卷，您的回覆將有助於我們了解您在與聊天機器人互動過程中的想法與感受。整份問卷僅需數分鐘完成，請依據您的真實感受作答。
-              </Paragraph>
+              title={`第${surveyType === 'A' ? '一' : '二'}份問卷調查`}
+              onLoad={handleIframeLoad}
+              allowFullScreen
+            />
+          </div>
+        ) : (
+          <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+            <Spin size="large" />
+            <div style={{ marginTop: '16px' }}>
+              <Text type="secondary" style={{ fontSize: '16px' }}>問卷準備中...</Text>
             </div>
           </div>
-          
-          <Divider style={{ margin: '8px 0' }} />
-          
-          <div className="survey-actions" style={{ display: 'flex', justifyContent: 'center' }}>
-            <Button
-              type="primary"
-              size="large"
-              onClick={handleSurveyClick}
-              icon={<FormOutlined />}
-              style={{ 
-                height: '48px', 
-                padding: '0 32px', 
-                fontSize: '1.1rem',
-                borderRadius: '8px',
-                boxShadow: '0 2px 0 rgba(0, 0, 0, 0.1)'
-              }}
-              disabled={!surveyUrl}
-            >
-              填寫第{surveyType === 'A' ? '一' : '二'}份問卷
-            </Button>
-          </div>
-        </Space>
+        )}
       </Card>
-      
-      {/* 倒數計時按鈕 */}
-      <div className="timer-section" style={{ 
-        marginTop: '32px', 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.02)',
-        padding: '20px',
-        borderRadius: '8px',
-        transition: 'background-color 0.3s'
+
+      {/* 繼續按鈕區域 */}
+      <div style={{ 
+        backgroundColor: 'rgba(24, 144, 255, 0.02)',
+        padding: '24px',
+        borderRadius: '12px',
+        border: '1px solid rgba(24, 144, 255, 0.1)',
+        textAlign: 'center'
       }}>
-        <Text type="secondary" style={{ marginBottom: '16px', display: 'flex', alignItems: 'center' }}>
-          <ClockCircleOutlined style={{ marginRight: '8px' }} /> 
-          {getDescriptionText()}
-        </Text>
+        <div style={{ marginBottom: '20px' }}>
+          <ClockCircleOutlined style={{ 
+            fontSize: '20px', 
+            color: '#1890ff', 
+            marginRight: '8px' 
+          }} />
+          <Text style={{ fontSize: '16px', color: '#666' }}>
+            {getDescriptionText()}
+          </Text>
+        </div>
         
         <Button
-          type="default"
+          type="primary"
           size="large"
           onClick={onComplete}
           disabled={countdown > 0}
-          icon={surveyType === 'A' ? <ArrowRightOutlined /> : <ArrowRightOutlined />}
+          icon={<ArrowRightOutlined />}
           style={{ 
-            minWidth: '160px',
-            height: '44px',
+            minWidth: '200px',
+            height: '48px',
             borderRadius: '8px',
-            transition: 'all 0.3s',
-            boxShadow: countdown > 0 ? 'none' : '0 2px 0 rgba(0, 0, 0, 0.05)'
+            fontSize: '16px',
+            fontWeight: 500,
+            boxShadow: countdown > 0 ? 'none' : '0 2px 0 rgba(5, 145, 255, 0.1)'
           }}
         >
           {getButtonText()}
         </Button>
+        
+        {countdown > 0 && (
+          <div style={{ marginTop: '12px' }}>
+            <Text type="secondary" style={{ fontSize: '14px' }}>
+              請完成問卷填寫後再繼續
+            </Text>
+          </div>
+        )}
       </div>
     </div>
   );
