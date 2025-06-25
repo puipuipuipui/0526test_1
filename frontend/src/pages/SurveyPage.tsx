@@ -308,12 +308,12 @@ function SurveyPage({
         textAlign: 'center'
       }}>
         <div style={{ marginBottom: '20px' }}>
-          <ClockCircleOutlined style={{ 
+          {/* <ClockCircleOutlined style={{ 
             fontSize: '20px', 
             color: '#1890ff', 
             marginRight: '8px' 
-          }} />
-          <Text style={{ fontSize: '16px', color: '#666' }}>
+          }} /> */}
+          <Text style={{ fontSize: '14px', color: '#ff0000' }}>
             {getDescriptionText()}
           </Text>
         </div>
